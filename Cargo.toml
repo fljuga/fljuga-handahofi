@@ -1,0 +1,35 @@
+[package]
+name = "fljuga-handahofi"
+version = "0.1.0"
+description = "reference rustc_codegen_mlir implementation"
+edition = "2024"
+
+[lib]
+crate-type = ["dylib"]
+
+[workspace]
+members = ["crates/*"]
+
+[workspace.package]
+authors = ["Yuriy Yarosh <yuriy@yarosh.dev>"]
+license = "Apache-2.0"
+repository = "https://github.com/fljuga/fljuga-handahofi"
+documentation = ""
+edition = "2024"
+
+[workspace.dependencies]
+winnow = "0.6"
+bytes = "*"
+http-body-util = "*"
+hyper = { version = "1.5", features = ["client", "http1", "http2"] }
+hyper-rustls = { version = "0.27", features = ["http2", "fips"] }
+hyper-util = { version = "0.1", features = ["full"] }
+rustls = { version = "0.23", features = ["tls12", "fips"] }
+tokio = { version = "1.41", features = ["full"]}
+thiserror = "2"
+webpki-roots = "*"
+tempfile = "*"
+goldie ="*"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"

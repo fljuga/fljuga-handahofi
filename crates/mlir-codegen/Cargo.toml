@@ -1,0 +1,32 @@
+[package]
+name = "fljuga-handahofi-mlir-codegen"
+description= "Implements mlir-c rust binging code generator"
+version = "0.1.0"
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+documentation.workspace = true
+edition.workspace = true
+
+[dependencies]
+fljuga-handahofi-tablegen = { path = "../tablegen" }
+hyper.workspace = true
+http-body-util.workspace = true
+hyper-rustls.workspace = true
+hyper-util.workspace = true
+rustls.workspace = true
+thiserror.workspace = true
+webpki-roots.workspace = true
+tokio.workspace = true
+tempfile.workspace = true
+once_cell = "1.20.2"
+
+[dev-dependencies]
+goldie.workspace = true
+
+[features]
+optional-tests-with-fixtures = []
+optional-tests = ["optional-tests-with-fixtures"]
+
+[lints]
+workspace = true
