@@ -4,38 +4,44 @@
 
 ## STATUS: WIP
 
+## Usage
+
+```bash
+
+```
+
 ### Supported Internal Dialects
 
- - [ ] [affine](https://mlir.llvm.org/docs/Dialects/Affine/) transforms
- - [ ] [arith](https://mlir.llvm.org/docs/Dialects/ArithOps/) transforms
+ - :construction: [affine](https://mlir.llvm.org/docs/Dialects/Affine/) transforms
+ - :construction: [arith](https://mlir.llvm.org/docs/Dialects/ArithOps/) transforms
  - [ ] [async](https://mlir.llvm.org/docs/Dialects/AsyncDialect/) runtimes support 
  - [ ] [bufferization](https://mlir.llvm.org/docs/Dialects/BufferizationOps/) to accumulate certain shapes for more effective hardware acceleration 
- - [ ] [cf](https://mlir.llvm.org/docs/Dialects/ControlFlowDialect/) basic unstructured program control flow constructs (if/when applicable)
+ - :construction: [cf](https://mlir.llvm.org/docs/Dialects/ControlFlowDialect/) basic unstructured program control flow constructs (if/when applicable)
  - [ ] [complex](https://mlir.llvm.org/docs/Dialects/ComplexOps/) numbers operations
  - [ ] [dlti](https://mlir.llvm.org/docs/Dialects/DLTIDialect/) data layout for specific compilation targets handling 
- - [ ] [func](https://mlir.llvm.org/docs/Dialects/Func/) calls and respective operations
+ - :construction: [func](https://mlir.llvm.org/docs/Dialects/Func/) calls and respective operations
  - [ ] [gpu](https://mlir.llvm.org/docs/Dialects/GPU/)  abstracts gpgpu computations, currently applicable primarily to
        [nvgpu](https://mlir.llvm.org/docs/Dialects/NVGPU/)
  - [ ] [index](https://mlir.llvm.org/docs/Dialects/IndexOps/) pointer indexing operations
  - [ ] [irdl](https://mlir.llvm.org/docs/Dialects/IRDL/) SSA-based IR generation
  - [ ] [linalg](https://mlir.llvm.org/docs/Dialects/Linalg/) linear algebra support 
- - [ ] [llvm](https://mlir.llvm.org/docs/Dialects/LLVM/) dialect backports the current llvm codegen to mlir
- - [ ] [math](https://mlir.llvm.org/docs/Dialects/MathOps/) complex math operations (trig and polynomials)
- - [ ] [memref](https://mlir.llvm.org/docs/Dialects/MemRef/) memory allocation operations
+ - :construction: [llvm](https://mlir.llvm.org/docs/Dialects/LLVM/) dialect backports the current llvm codegen to mlir
+ - :construction: [math](https://mlir.llvm.org/docs/Dialects/MathOps/) complex math operations (trig and polynomials)
+ - :construction: [memref](https://mlir.llvm.org/docs/Dialects/MemRef/) memory allocation operations
  - [ ] [mesh](https://mlir.llvm.org/docs/Dialects/Mesh/) sharding operations over cluster of devices
  - [ ] [ML program](https://mlir.llvm.org/docs/Dialects/MLProgramOps/) written in modern ML frameworks 
        ([TensorFlow](https://www.tensorflow.org/)/[JAX](https://jax.readthedocs.io/en/latest/index.html))
- - [ ] [pdl](https://mlir.llvm.org/docs/Dialects/PDLOps/) pattern definition language for MLIR rewrites
- - [ ] [pdl interp](https://mlir.llvm.org/docs/Dialects/PDLInterpOps/) low-level PDL interpreter operations
+ - :construction: [pdl](https://mlir.llvm.org/docs/Dialects/PDLOps/) pattern definition language for MLIR rewrites
+ - :construction: [pdl interp](https://mlir.llvm.org/docs/Dialects/PDLInterpOps/) low-level PDL interpreter operations
  - [ ] [polynomial](https://mlir.llvm.org/docs/Dialects/PolynomialDialect/) single variable polynomials
- - [ ] [ptr](https://mlir.llvm.org/docs/Dialects/PtrOps/) pointer primitive
- - [ ] [quant](https://mlir.llvm.org/docs/Dialects/QuantDialect/) quantization operations
- - [ ] [scf](https://mlir.llvm.org/docs/Dialects/SCFDialect/) structured control flow (`if` conditions and `for` loops)
- - [ ] [shape](https://mlir.llvm.org/docs/Dialects/ShapeDialect/) represents abastract structures
+ - :construction: [ptr](https://mlir.llvm.org/docs/Dialects/PtrOps/) pointer primitive
+ - :construction: [quant](https://mlir.llvm.org/docs/Dialects/QuantDialect/) quantization operations
+ - :construction: [scf](https://mlir.llvm.org/docs/Dialects/SCFDialect/) structured control flow (`if` conditions and `for` loops)
+ - :construction: [shape](https://mlir.llvm.org/docs/Dialects/ShapeDialect/) represents abastract structures
  - [ ] [tensor](https://mlir.llvm.org/docs/Dialects/TensorOps/) operations
  - [ ] [tensor operator set](https://mlir.llvm.org/docs/Dialects/TOSA/) generalized tensor operations, hardware-agnostic over CPU/GPU/NPU
  - [ ] [sparse tensor](https://mlir.llvm.org/docs/Dialects/SparseTensorOps/) operations
- - [ ] [ub](https://mlir.llvm.org/docs/Dialects/UBOps/) marks undefined behavior constant poisoning
+ - :construction: [ub](https://mlir.llvm.org/docs/Dialects/UBOps/) marks undefined behavior constant poisoning
 
 ### Supported External Dialects
 
@@ -72,13 +78,10 @@ asdf plugin add rust
 asdf install
 asdf current # should list all the correct versions from .tools-versions file
 
-# wasm-pack for rust, as well 
-cargo install cargo-run-bin
-
-# fljúga uses feature flags
-rustup default nightly
+rustup default nightly # fljúga handahófi may switch to stable in the future
 rustup component add clippy-preview
 rustup component add rustfmt
+cargo install cargo-run-bin
 
 cargo bin --install
 
@@ -91,7 +94,12 @@ echo ". \"\$HOME/.asdf/installs/rust/$(cat .tool-versions| grep rust | awk '{pri
 # Linting
 cargo bin licensure -i **/*.rs
 rustfmt --edition 2024 **/*.rs
-
+# commit changes
+cargo clippy --fix  
 ```
 
-## 
+
+## License
+
+*fljúga handahófi* is licensed under the terms of [Apache License, Version 2.0](LICENSE), because patents and liability claims are a pain.
+
