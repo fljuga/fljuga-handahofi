@@ -1,8 +1,10 @@
 .idea
 .vscode
 
-*.log
+.DS_Store
 
+.bin/
 target/
-
 .fixtures/
+
+*.log

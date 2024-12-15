@@ -7,3 +7,10 @@
 //!
 
 mod grammar;
+
+
+fn parse_tablegen<'a>(str: &'a str) -> grammar::TableGen<'a> {
+    grammar::TableGen::<'a>{
+        name: "r"
+    }
+}

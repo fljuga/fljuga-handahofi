@@ -1,6 +1,17 @@
+//! ## fljúga handahófi mlir codegen
+//!
+//! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
+//! a code generator targeting [LLVM MLIR](https://mlir.llvm.org/) Transformations and Dialects.
+//!
+//! *fljuga-handahofi-mlir-codegen* generates rust bindings for [mlir-c](https://mlir.llvm.org/docs/CAPI/) API using LLVM TableGen format.
+//!
+//! TableGen module processes and code generates various MLIR dialect bindings.
+//! *fljúga handahófi* targets the majority of MLIR dialects.
+//!
+
+use crate::client::ClientError;
 use std::path::Path;
 use tokio::io::{self, ErrorKind};
-use crate::client::ClientError;
 
 /// Derived [thiserror::Error] for TableGen errors
 #[derive(thiserror::Error, Debug)]
@@ -87,11 +98,11 @@ async fn download_tablegen_files(dest: &Path) -> Result<(), TableGenError> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use once_cell::sync::Lazy;
     use tokio::sync::Mutex;
-    use super::*;
 
-    static TEST_FIXTURES_DIR: Lazy<Mutex<&Path>> = Lazy::new( || {
+    static TEST_FIXTURES_DIR: Lazy<Mutex<&Path>> = Lazy::new(|| {
         Mutex::new(Path::new("./.fixtures"))
     });
 

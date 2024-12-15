@@ -243,6 +243,118 @@ name = "fljuga-handahofi"
 version = "0.1.0"
 
 [[package]]
+name = "fljuga-handahofi-dialect-amdgpu"
+version = "0.1.0"
+dependencies = [
+ "fljuga-handahofi-mlir-codegen",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-amx"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-arm-neon"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-arm-sme"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-arm-sve"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-emit-c"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-intel-xe"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-mpi"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-nvgpu"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-nvvm"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-omp"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-openacc"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-riscv-vcix"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-rocdl"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-spirv"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
+name = "fljuga-handahofi-dialect-x86-vector"
+version = "0.1.0"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
 name = "fljuga-handahofi-mlir-codegen"
 version = "0.1.0"
 dependencies = [

@@ -5,3 +5,5 @@
 //! MLIR itself supports numerous heterogeneous compilation dialects targeting variety of devices: CPUs, GPUs, TPUs.
 //! It even targets hardware description languages with [circt](https://github.com/llvm/circt) project.
 //!
+
+mod targets;

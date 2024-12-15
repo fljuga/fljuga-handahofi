@@ -1,12 +1,15 @@
 [package]
 name = "fljuga-handahofi-mlir-codegen"
-description= "Implements mlir-c rust binging code generator"
+description = "Implements mlir-c rust binging code generator"
 version = "0.1.0"
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
 documentation.workspace = true
 edition.workspace = true
+
+[lib]
+proc-macro = true
 
 [dependencies]
 fljuga-handahofi-tablegen = { path = "../tablegen" }

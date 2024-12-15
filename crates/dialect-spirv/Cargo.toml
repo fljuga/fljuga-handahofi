@@ -1,0 +1,16 @@
+[package]
+name = "fljuga-handahofi-dialect-spirv"
+description = "fljúga handahófi spirv dialect support"
+version = "0.1.0"
+authors.workspace = true
+documentation.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+winnow.workspace = true
+
+[lints]
+workspace = true

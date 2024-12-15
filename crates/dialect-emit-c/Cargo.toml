@@ -1,0 +1,16 @@
+[package]
+name = "fljuga-handahofi-dialect-emit-c"
+description = "fljúga handahófi mlir emit C dialect support"
+version = "0.1.0"
+authors.workspace = true
+documentation.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+winnow.workspace = true
+
+[lints]
+workspace = true

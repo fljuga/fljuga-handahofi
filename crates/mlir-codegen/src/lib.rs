@@ -16,9 +16,4 @@
 extern crate fljuga_handahofi_tablegen;
 
 mod tablegen;
-pub mod client;
-
-#[tokio::main]
-async fn main() {
-
-}
+mod client;

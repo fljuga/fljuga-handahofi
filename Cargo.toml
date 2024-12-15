@@ -18,18 +18,25 @@ documentation = ""
 edition = "2024"
 
 [workspace.dependencies]
-winnow = "0.6"
+winnow = "^0.6"
 bytes = "*"
 http-body-util = "*"
-hyper = { version = "1.5", features = ["client", "http1", "http2"] }
-hyper-rustls = { version = "0.27", features = ["http2", "fips"] }
-hyper-util = { version = "0.1", features = ["full"] }
-rustls = { version = "0.23", features = ["tls12", "fips"] }
-tokio = { version = "1.41", features = ["full"]}
-thiserror = "2"
+hyper = { version = "^1.5", features = ["client", "http1", "http2"] }
+hyper-rustls = { version = "^0.27", features = ["http2", "fips"] }
+hyper-util = { version = "^0.1", features = ["full"] }
+rustls = { version = "^0.23", features = ["tls12", "fips"] }
+tokio = { version = "^1.41", features = ["full"] }
+thiserror = "^2"
 webpki-roots = "*"
 tempfile = "*"
-goldie ="*"
+goldie = "*"
+
+[workspace.metadata.bin]
+#cargo-binstall = { version = "^1.10" }
+cargo-nextest = { version = "^0.9" }
+licensure = { version = "^0.5" }
+clippy = { version = "0.0.302" }
+rustfmt-nightly = { version = "1.4.21" }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

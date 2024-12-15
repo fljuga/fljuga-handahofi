@@ -1,0 +1,16 @@
+[package]
+name = "fljuga-handahofi-dialect-amdgpu"
+description = "fljúga handahófi AMD GPU dialect support"
+version = "0.1.0"
+authors.workspace = true
+documentation.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+fljuga-handahofi-mlir-codegen = { path = "../mlir-codegen" }
+
+[lints]
+workspace = true

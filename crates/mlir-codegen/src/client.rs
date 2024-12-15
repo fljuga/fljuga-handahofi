@@ -1,11 +1,21 @@
-use hyper::http::uri::{InvalidUri};
-use hyper::{Method, Request, StatusCode, Uri};
-use hyper_rustls::HttpsConnector;
-use hyper_util::client::legacy::{Client as HyperClient};
-use hyper_util::client::legacy::connect::HttpConnector;
+//! ## fljúga handahófi mlir codegen
+//!
+//! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
+//! a code generator targeting [LLVM MLIR](https://mlir.llvm.org/) Transformations and Dialects.
+//!
+//! *fljuga-handahofi-mlir-codegen* generates rust bindings for [mlir-c](https://mlir.llvm.org/docs/CAPI/) API using LLVM TableGen format.
+//!
+//! Http Client Module.
+//!
+
 use http_body_util::*;
 use hyper::body::Bytes;
 use hyper::header::ToStrError;
+use hyper::http::uri::InvalidUri;
+use hyper::{Method, Request, StatusCode, Uri};
+use hyper_rustls::HttpsConnector;
+use hyper_util::client::legacy::connect::HttpConnector;
+use hyper_util::client::legacy::Client as HyperClient;
 use hyper_util::rt::TokioExecutor;
 
 /// Derived [thiserror::Error] for hyper errors
@@ -40,19 +50,20 @@ pub enum ClientError {
     TooManyRedirects,
 
     #[error("No content")]
-    NoContent{
+    NoContent {
         status_code: StatusCode,
-    }
+    },
 }
 
-pub struct Client{
-    https_connector: HttpsConnector<HttpConnector>
+// Implements simple http1&2 GET http client wrapper.
+/// Wraps [hyper] [HttpsConnector] with [aws_lc_rs] [rustls] provider.
+pub struct Client {
+    https_connector: HttpsConnector<HttpConnector>,
 }
 
 impl Client {
-
     /// Creates a new [hyper] http client wrapper.
-    pub fn new() -> Client {
+    pub(crate) fn new() -> Client {
         let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
 
         let mut root_cert_store = rustls::RootCertStore::empty();
@@ -119,7 +130,7 @@ impl Client {
             res = self.get_without_redirects(resolved_url).await;
         }
 
-       Err(ClientError::TooManyRedirects)
+        Err(ClientError::TooManyRedirects)
     }
 }
 
