@@ -77,6 +77,8 @@ cargo install cargo-run-bin
 
 # fljúga uses feature flags
 rustup default nightly
+rustup component add clippy-preview
+rustup component add rustfmt
 
 cargo bin --install
 
@@ -87,8 +89,8 @@ echo "export PATH=\"\$PATH:\$HOME/.cargo/bin\"" >> ~/.zshrc # or .bashrc
 echo ". \"\$HOME/.asdf/installs/rust/$(cat .tool-versions| grep rust | awk '{print $2}')/env\"" >> ~/.zshrc # or .bashrc
 
 # Linting
-cargo bin rustfmt-nightly
-
+cargo bin licensure -i **/*.rs
+rustfmt --edition 2024 **/*.rs
 
 ```
 

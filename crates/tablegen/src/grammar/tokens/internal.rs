@@ -1,3 +1,18 @@
+/*
+   Copyright (C) 2022-2024 Yuriy Yarosh.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 //! ## fljúga handahófi tablegen
 //!
 //! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
@@ -6,13 +21,13 @@
 //! Tablegen token parsing helpers and deconstructed parser plumbing material.
 //!
 
+use winnow::PResult;
 use winnow::ascii::*;
 use winnow::combinator::*;
 use winnow::error::*;
-use winnow::token::*;
-use winnow::PResult;
-use winnow::*;
 use winnow::stream::AsChar;
+use winnow::token::*;
+use winnow::*;
 
 /// Parses 0..1+
 fn bin_digit1<'a>(input: &mut &'a str) -> PResult<&'a str> {
@@ -26,7 +41,7 @@ pub(crate) fn hex_or_bin_i64(input: &mut &str) -> PResult<i64> {
         "0b" => bin_digit1.try_map(|s| i64::from_str_radix(s, 2)),
         _ => fail,
     )
-        .parse_next(input)
+    .parse_next(input)
 }
 
 /// Parses signed dec number.
@@ -56,9 +71,8 @@ pub(crate) fn dec_i64(input: &mut &str) -> PResult<i64> {
         dec_istr.try_map(|s: &str| s.parse::<i64>()),
         dec_ustr.try_map(|s: &str| s.parse::<i64>()),
     ))
-        .parse_next(input)
+    .parse_next(input)
 }
-
 
 /// Parses dec hex bin numbers into i64.
 pub(crate) fn int(input: &mut &str) -> PResult<i64> {
@@ -74,7 +88,6 @@ pub(crate) fn alpha_identifier_chars1<'a>(input: &mut &'a str) -> PResult<&'a st
 pub(crate) fn digit_identifier_chars0<'a>(input: &mut &'a str) -> PResult<&'a str> {
     take_while(0.., '0'..='9').parse_next(input)
 }
-
 
 const RESERVED_WORDS: [&str; 25] = [
     "assert",
@@ -104,7 +117,10 @@ const RESERVED_WORDS: [&str; 25] = [
     "true",
 ];
 
-pub(crate) fn concat<'a, P, const N: usize>(parsers: [P; N], input: &mut &'a str) -> PResult<&'a str>
+pub(crate) fn concat<'a, P, const N: usize>(
+    parsers: [P; N],
+    input: &mut &'a str,
+) -> PResult<&'a str>
 where
     P: Fn(&mut &'a str) -> PResult<&'a str>,
 {
@@ -129,9 +145,7 @@ pub type GenParserPtr<'a, T> = fn(&mut &'a str) -> PResult<&'a T>;
 pub type StrParser<'a> = GenParserPtr<'a, str>;
 
 pub(crate) fn spaced<'a>(s: &'static str) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
-    move |input: &mut &'a str| {
-        delimited(space0, literal(s), space0).parse_next(input)
-    }
+    move |input: &mut &'a str| delimited(space0, literal(s), space0).parse_next(input)
 }
 
 pub(crate) fn identifier<'a>(input: &mut &'a str) -> PResult<&'a str> {
@@ -151,32 +165,26 @@ pub(crate) fn identifier<'a>(input: &mut &'a str) -> PResult<&'a str> {
     }
 }
 
-
 fn type_name_suffix<'a>(input: &mut &'a str) -> PResult<&'a str> {
     literal(">").parse_next(input)
 }
 
 pub(crate) fn generic_bits_type_name(input: &mut &str) -> PResult<i64> {
-    delimited(
-        literal("bits<"),
-        int,
-        literal(">"),
-    ).parse_next(input)
+    delimited(literal("bits<"), int, literal(">")).parse_next(input)
 }
 
 pub(crate) fn generic_type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
-    delimited(
-        literal("type<"),
-        identifier,
-        literal(">"),
-    ).parse_next(input)
+    delimited(literal("type<"), identifier, literal(">")).parse_next(input)
 }
 
 pub(crate) fn variable_name_chars<'a>(input: &mut &'a str) -> PResult<&'a str> {
-    concat([
-               alpha_identifier_chars1 as StrParser<'a>,
-               digit_identifier_chars0 as StrParser<'a>,
-           ], input)
+    concat(
+        [
+            alpha_identifier_chars1 as StrParser<'a>,
+            digit_identifier_chars0 as StrParser<'a>,
+        ],
+        input,
+    )
 }
 
 #[cfg(test)]
@@ -263,9 +271,9 @@ pub mod tests {
     fn should_parse_identifiers() {
         test_parser(
             vec![
-                ("01id", Some("01id"), ""),         // Valid prefixed identifier, fully consumed
-                ("0id01", Some("0id01"), ""),     // Valid suffixed identifier, fully consumed
-                ("id191x", Some("id191"), "x"),   // Partially valid identifier input, stops before 'x'
+                ("01id", Some("01id"), ""),   // Valid prefixed identifier, fully consumed
+                ("0id01", Some("0id01"), ""), // Valid suffixed identifier, fully consumed
+                ("id191x", Some("id191"), "x"), // Partially valid identifier input, stops before 'x'
                 ("1id191x", Some("1id191"), "x"), // Partially valid identifier input, stops before 'x'
                 ("", None, ""),                   // Empty input should fail
             ],
@@ -277,18 +285,18 @@ pub mod tests {
     fn should_parse_generic_types() {
         test_parser(
             vec![
-                ("bits<12>", Some(12), ""),         // Valid prefixed identifier, fully consumed
-                ("bits<15>xx", Some(15), "xx"),   // Partially valid identifier input, stops before 'x'
-                ("", None, ""),                   // Empty input should fail
+                ("bits<12>", Some(12), ""), // Valid prefixed identifier, fully consumed
+                ("bits<15>xx", Some(15), "xx"), // Partially valid identifier input, stops before 'x'
+                ("", None, ""),                 // Empty input should fail
             ],
             generic_bits_type_name,
         );
 
         test_parser(
             vec![
-                ("type<typename>", Some("typename"), ""),         // Valid prefixed identifier, fully consumed
-                ("type<typename>xx", Some("typename"), "xx"),   // Partially valid identifier input, stops before 'x'
-                ("", None, ""),                   // Empty input should fail
+                ("type<typename>", Some("typename"), ""), // Valid prefixed identifier, fully consumed
+                ("type<typename>xx", Some("typename"), "xx"), // Partially valid identifier input, stops before 'x'
+                ("", None, ""),                               // Empty input should fail
             ],
             generic_type_name,
         );

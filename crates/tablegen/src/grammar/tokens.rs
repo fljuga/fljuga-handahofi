@@ -1,3 +1,18 @@
+/*
+   Copyright (C) 2022-2024 Yuriy Yarosh.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 //! ## fljúga handahófi tablegen
 //!
 //! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
@@ -6,12 +21,12 @@
 //! Common Tablegen tokens.
 //!
 
+use winnow::PResult;
 use winnow::ascii::*;
 use winnow::combinator::*;
 use winnow::error::*;
 use winnow::stream::{AsChar, Stream};
 use winnow::token::*;
-use winnow::PResult;
 use winnow::*;
 
 pub(crate) mod internal;
@@ -25,7 +40,7 @@ fn code<'a>(input: &mut &'a str) -> PResult<&'a str> {
         "[{",
         terminated(take_while(1.., |c: char| !"[{}]".contains(c)), "}]"),
     )
-        .parse_next(input)
+    .parse_next(input)
 }
 
 fn variable_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
@@ -46,10 +61,13 @@ fn preprocessor_directive<'a>(input: &mut &'a str) -> PResult<&'a str> {
         alt(("define", "ifdef", "ifndef")).parse_next(input)
     }
 
-    internal::concat([
-                         hash as internal::StrParser<'a>,
-                         directive as internal::StrParser<'a>,
-                     ], input)
+    internal::concat(
+        [
+            hash as internal::StrParser<'a>,
+            directive as internal::StrParser<'a>,
+        ],
+        input,
+    )
 }
 
 fn type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
@@ -61,7 +79,8 @@ fn type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
         // internal::generic_bits_type_name,
         // internal::generic_type_name,
         internal::identifier,
-    )).parse_next(input)
+    ))
+    .parse_next(input)
 }
 
 #[cfg(test)]
@@ -73,9 +92,9 @@ mod tests {
     fn should_parse_preprocessor_directives() {
         test_parser(
             vec![
-                ("#define", Some("#define"), ""),      // Valid preprocessor, fully consumed
-                ("#definexx", Some("#define"), "xx"),  // Partially valid preprocessor input, stops before 'x'
-                ("", None, ""),                   // Empty input should fail
+                ("#define", Some("#define"), ""), // Valid preprocessor, fully consumed
+                ("#definexx", Some("#define"), "xx"), // Partially valid preprocessor input, stops before 'x'
+                ("", None, ""),                       // Empty input should fail
             ],
             preprocessor_directive,
         );

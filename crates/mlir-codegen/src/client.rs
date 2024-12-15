@@ -1,3 +1,18 @@
+/*
+   Copyright (C) 2022-2024 Yuriy Yarosh.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 //! ## fljúga handahófi mlir codegen
 //!
 //! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
@@ -14,8 +29,8 @@ use hyper::header::ToStrError;
 use hyper::http::uri::InvalidUri;
 use hyper::{Method, Request, StatusCode, Uri};
 use hyper_rustls::HttpsConnector;
-use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::client::legacy::Client as HyperClient;
+use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::rt::TokioExecutor;
 
 /// Derived [thiserror::Error] for hyper errors
@@ -34,14 +49,10 @@ pub enum ClientError {
     HyperError(#[from] hyper_util::client::legacy::Error),
 
     #[error("{to:?}")]
-    Redirected {
-        to: String,
-    },
+    Redirected { to: String },
 
     #[error("{uri:?}")]
-    LocationMissing {
-        uri: String,
-    },
+    LocationMissing { uri: String },
 
     #[error("{0}")]
     StringConvertError(#[from] ToStrError),
@@ -50,9 +61,7 @@ pub enum ClientError {
     TooManyRedirects,
 
     #[error("No content")]
-    NoContent {
-        status_code: StatusCode,
-    },
+    NoContent { status_code: StatusCode },
 }
 
 // Implements simple http1&2 GET http client wrapper.
@@ -78,7 +87,7 @@ impl Client {
                 .with_tls_config(config)
                 .https_only()
                 .enable_all_versions()
-                .build()
+                .build(),
         }
     }
 
@@ -92,26 +101,29 @@ impl Client {
             // .header(hyper::header::HOST, authority.as_str())
             .body(Empty::new())?;
 
-        let client = HyperClient::builder(TokioExecutor::new())
-            .build(self.https_connector.clone());
+        let client = HyperClient::builder(TokioExecutor::new()).build(self.https_connector.clone());
 
         let res = client.request(req).await?;
 
         match res.status() {
             StatusCode::OK => Ok(res.into_body().collect().await?.to_bytes()),
             status if status.is_redirection() => {
-                let loc = res.headers().get(hyper::header::LOCATION).ok_or_else(||
-                    ClientError::LocationMissing { uri: url.to_string() }
-                )?;
-                Err(ClientError::Redirected { to: loc.to_str()?.to_string() })
+                let loc = res.headers().get(hyper::header::LOCATION).ok_or_else(|| {
+                    ClientError::LocationMissing {
+                        uri: url.to_string(),
+                    }
+                })?;
+                Err(ClientError::Redirected {
+                    to: loc.to_str()?.to_string(),
+                })
             }
-            _ => Err(ClientError::NoContent { status_code: res.status() }),
+            _ => Err(ClientError::NoContent {
+                status_code: res.status(),
+            }),
         }
     }
 
-
     const MAX_REDIRECTS: usize = 10;
-
 
     /// Performs HTTP GET request, following redirects
     pub async fn get(&self, url: &str) -> Result<Bytes, ClientError> {
@@ -124,7 +136,7 @@ impl Client {
                     resolved_url = to.as_str();
                 }
 
-                _ => return res
+                _ => return res,
             }
 
             res = self.get_without_redirects(resolved_url).await;

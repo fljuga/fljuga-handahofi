@@ -1,3 +1,18 @@
+/*
+   Copyright (C) 2022-2024 Yuriy Yarosh.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 //! ## fljúga handahófi mlir codegen
 //!
 //! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
@@ -29,12 +44,12 @@ pub enum TableGenError {
 /// Should be updated once in a while.
 ///
 const TABLE_GEN_FILES: [&str; 49] = [
-    "Dialect/Affine/IR/AffineOps.td", // AffineOps.td
-    "Dialect/AMDGPU/IR/AMDGPU.td", // AMDGPUOps.td
-    "Dialect/Arith/IR/ArithOps.td",   // ArithOps.td
-    "Dialect/Async/IR/AsyncOps.td",   // AsyncOps.td
+    "Dialect/Affine/IR/AffineOps.td",                 // AffineOps.td
+    "Dialect/AMDGPU/IR/AMDGPU.td",                    // AMDGPUOps.td
+    "Dialect/Arith/IR/ArithOps.td",                   // ArithOps.td
+    "Dialect/Async/IR/AsyncOps.td",                   // AsyncOps.td
     "Dialect/Bufferization/IR/BufferizationEnums.td", // BufferizationEnums.td
-    "Dialect/Bufferization/IR/BufferizationOps.td", // BufferizationOps.td
+    "Dialect/Bufferization/IR/BufferizationOps.td",   // BufferizationOps.td
     "Dialect/Bufferization/TransformOps/BufferizationTransformOps.td", // BufferizationTransformOps.td
     "IR/BuiltinOps.td",                                                // BuiltinOps.td
     "Dialect/Complex/IR/ComplexOps.td",                                // ComplexOps.td
@@ -66,21 +81,22 @@ const TABLE_GEN_FILES: [&str; 49] = [
     "Dialect/SparseTensor/IR/SparseTensorAttrDefs.td",     // SparseTensorAttrDefs.td
     "Dialect/SparseTensor/IR/SparseTensorOps.td",          // SparseTensorOps.td
     "Dialect/SparseTensor/TransformOps/SparseTensorTransformOps.td", // "SparseTensorTransformOps.td
-    "Dialect/SPIRV/IR/SPIRVOps.td",                                  // SPIRVOps.td
-    "Dialect/Tensor/IR/TensorOps.td",                                // TensorOps.td
-    "Dialect/Tensor/TransformOps/TensorTransformOps.td",             // TensorTransformOps.td
-    "Dialect/Tosa/IR/TosaOps.td",                                    // TosaOps.td
-    "Dialect/Transform/IR/TransformAttrs.td",                        // TransformAttrs.td
-    "Dialect/Transform/IR/TransformOps.td",                          // TransformOps.td
-    "Dialect/Transform/PDLExtension/PDLExtensionOps.td", // TransformPDLExtensionOps.td
-    "Dialect/Vector/IR/VectorAttributes.td",             // VectorAttributes.td
-    "Dialect/Vector/IR/VectorOps.td",                    // VectorOps.td
-    "Dialect/Vector/IR/Vector.td",                       // Vector.td
-    "Dialect/Vector/TransformOps/VectorTransformOps.td", // VectorTransformOps.td
-    "Dialect/Vector/Transforms/VectorTransformsBase.td", // VectorTransformsBase.td
+    "Dialect/SPIRV/IR/SPIRVOps.td",                        // SPIRVOps.td
+    "Dialect/Tensor/IR/TensorOps.td",                      // TensorOps.td
+    "Dialect/Tensor/TransformOps/TensorTransformOps.td",   // TensorTransformOps.td
+    "Dialect/Tosa/IR/TosaOps.td",                          // TosaOps.td
+    "Dialect/Transform/IR/TransformAttrs.td",              // TransformAttrs.td
+    "Dialect/Transform/IR/TransformOps.td",                // TransformOps.td
+    "Dialect/Transform/PDLExtension/PDLExtensionOps.td",   // TransformPDLExtensionOps.td
+    "Dialect/Vector/IR/VectorAttributes.td",               // VectorAttributes.td
+    "Dialect/Vector/IR/VectorOps.td",                      // VectorOps.td
+    "Dialect/Vector/IR/Vector.td",                         // Vector.td
+    "Dialect/Vector/TransformOps/VectorTransformOps.td",   // VectorTransformOps.td
+    "Dialect/Vector/Transforms/VectorTransformsBase.td",   // VectorTransformsBase.td
 ];
 
-const BASE_URI: &str = "https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/mlir/include/mlir/";
+const BASE_URI: &str =
+    "https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/mlir/include/mlir/";
 
 async fn download_tablegen_files(dest: &Path) -> Result<(), TableGenError> {
     let _ = tokio::fs::create_dir_all(dest).await;
@@ -89,8 +105,12 @@ async fn download_tablegen_files(dest: &Path) -> Result<(), TableGenError> {
 
     Ok(for url_path in TABLE_GEN_FILES {
         let url = format!("{BASE_URI}{url_path}");
-        let bytes = client.get(&url).await.map_err(|e| io::Error::new(ErrorKind::InvalidData, e))?;
-        let content = String::from_utf8(bytes.to_vec()).map_err(|e| io::Error::new(ErrorKind::InvalidData, e))?;
+        let bytes = client
+            .get(&url)
+            .await
+            .map_err(|e| io::Error::new(ErrorKind::InvalidData, e))?;
+        let content = String::from_utf8(bytes.to_vec())
+            .map_err(|e| io::Error::new(ErrorKind::InvalidData, e))?;
         let filename = Path::new(url_path).file_name().unwrap();
         tokio::fs::write(dest.join(filename), content).await?
     })
@@ -102,9 +122,8 @@ mod tests {
     use once_cell::sync::Lazy;
     use tokio::sync::Mutex;
 
-    static TEST_FIXTURES_DIR: Lazy<Mutex<&Path>> = Lazy::new(|| {
-        Mutex::new(Path::new("./.fixtures"))
-    });
+    static TEST_FIXTURES_DIR: Lazy<Mutex<&Path>> =
+        Lazy::new(|| Mutex::new(Path::new("./.fixtures")));
 
     async fn tablegen_fixtures() -> Vec<String> {
         let fixtures_path = TEST_FIXTURES_DIR.lock().await;
@@ -125,7 +144,9 @@ mod tests {
             assert!(metadata.is_file());
             assert!(metadata.len() > 0, "File {:?} is empty", file_path);
 
-            downloaded_files.push(String::from_utf8(tokio::fs::read(file_path).await.unwrap().to_vec()).unwrap());
+            downloaded_files.push(
+                String::from_utf8(tokio::fs::read(file_path).await.unwrap().to_vec()).unwrap(),
+            );
         }
 
         // Check that the expected number of files were downloaded

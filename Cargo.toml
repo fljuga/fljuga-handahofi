@@ -35,8 +35,6 @@ goldie = "*"
 #cargo-binstall = { version = "^1.10" }
 cargo-nextest = { version = "^0.9" }
 licensure = { version = "^0.5" }
-clippy = { version = "0.0.302" }
-rustfmt-nightly = { version = "1.4.21" }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
