@@ -13,7 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
 //! ## fljúga handahófi x86 vector dialect support.
 //!
-//! Implements low-level x86 vector dialect.
+//! Implements low-level x86 vector emission.
 //!

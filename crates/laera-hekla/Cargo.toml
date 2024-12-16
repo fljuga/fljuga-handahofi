@@ -1,6 +1,6 @@
 [package]
-name = "fljuga-handahofi-dialect-intel-amx"
-description = "fljúga handahófi Intel AMX dialect support."
+name = "fljuga-handahofi-laera-hekla"
+description = "læra að hekla is fljúga handahófi distributed computing framework"
 version = "0.1.0"
 authors.workspace = true
 documentation.workspace = true

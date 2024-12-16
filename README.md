@@ -6,11 +6,15 @@
 
 ## Usage
 
+Is fairly similar to [cranelift]() compiler.
+
 ```bash
 
 ```
 
-### Supported Internal Dialects
+## [Documentation](./doc)
+
+### Supported Input Dialects
 
  - :construction: [affine](https://mlir.llvm.org/docs/Dialects/Affine/) transforms
  - :construction: [arith](https://mlir.llvm.org/docs/Dialects/ArithOps/) transforms
@@ -25,7 +29,6 @@
  - [ ] [index](https://mlir.llvm.org/docs/Dialects/IndexOps/) pointer indexing operations
  - [ ] [irdl](https://mlir.llvm.org/docs/Dialects/IRDL/) SSA-based IR generation
  - [ ] [linalg](https://mlir.llvm.org/docs/Dialects/Linalg/) linear algebra support 
- - :construction: [llvm](https://mlir.llvm.org/docs/Dialects/LLVM/) dialect backports the current llvm codegen to mlir
  - :construction: [math](https://mlir.llvm.org/docs/Dialects/MathOps/) complex math operations (trig and polynomials)
  - :construction: [memref](https://mlir.llvm.org/docs/Dialects/MemRef/) memory allocation operations
  - [ ] [mesh](https://mlir.llvm.org/docs/Dialects/Mesh/) sharding operations over cluster of devices
@@ -43,7 +46,7 @@
  - [ ] [sparse tensor](https://mlir.llvm.org/docs/Dialects/SparseTensorOps/) operations
  - :construction: [ub](https://mlir.llvm.org/docs/Dialects/UBOps/) marks undefined behavior constant poisoning
 
-### Supported External Dialects
+### Supported Output Dialects
 
  - [ ] [OpenACC](https://openacc.org/) (**[CRATE](./crates/dialect-openacc)**) fortran/C heterogeneous CPU/GPU accelerated operations
  - [ ] [AMD GPU](https://mlir.llvm.org/docs/Dialects/AMDGPU/) (**[CRATE](./crates/dialect-amdgpu)**) dialect for [ROCm](https://www.amd.com/en/products/software/rocm.html),
@@ -54,27 +57,37 @@
  - [ ] [ARM SVE](https://developer.arm.com/Architectures/Scalable%20Vector%20Extensions) (**[CRATE](./crates/dialect-arm-sve)**) fancy ARM SIMD dialect for modern ARMv9+ ISA (as of 2023)
  - [ ] [ARM SME](https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/arm-scalable-matrix-extension-introduction) (**[CRATE](./crates/dialect-arm-sme)**) floating point operations
  - [ ] [emitc](https://mlir.llvm.org/docs/Dialects/EmitC/) (**[CRATE](./crates/dialect-emit-c)**) emits C, can be used for debugging
- - [ ] [mpi](https://mlir.llvm.org/docs/Dialects/MPI/) (**[CRATE](./crates/dialect-mpi)**) abstracts proprietary MPI4.0 communication interfaces 
+ - :construction: [llvm](https://mlir.llvm.org/docs/Dialects/LLVM/) dialect backports the current llvm codegen to mlir
+ - [ ] [mpi](https://mlir.llvm.org/docs/Dialects/MPI/) (**[CRATE](./crates/dialect-mpi)**) abstracts proprietary MPI4.0 communication interfaces
  - [ ] [nvgpu](https://mlir.llvm.org/docs/Dialects/NVGPU/) (**[CRATE](./crates/dialect-nvgpu)**) high-level nvidia gpu dialect
  - [ ] [nvvm](https://mlir.llvm.org/docs/Dialects/NVVMDialect/) (**[CRATE](./crates/dialect-nvvm)**) low-level nvidia ptx vm dialect, compiled from nvgpu 
  - [ ] [omp](https://mlir.llvm.org/docs/Dialects/OpenMPDialect/) (**[CRATE](./crates/omp)**) low-level [OpenMP](https://www.openmp.org/) dialect
  - [ ] [rocdl](https://mlir.llvm.org/docs/Dialects/ROCDLDialect/) (**[CRATE](./crates/dialect-rocdl)**) low-level AMD gpu dialect
  - [ ] [vcix](https://mlir.llvm.org/docs/Dialects/VCIXDialect/) (**[CRATE](./crates/dialect-riscv-vcix)**) RISC-V [SiFive VCIX](https://www.sifive.com/technology/vectors)
- - [ ] [x86 vector](https://mlir.llvm.org/docs/Dialects/X86Vector/) (**[CRATE](./crates/dialect-x86-vector)**) for the most common SSE/AVX x86 SIMD instruction sets
+ - :construction: [x86 vector](https://mlir.llvm.org/docs/Dialects/X86Vector/) (**[CRATE](./crates/dialect-x86-vector)**) for the most common SSE/AVX x86 SIMD instruction sets
  - [ ] [xegpu](https://mlir.llvm.org/docs/Dialects/XeGPU/) (**[CRATE](./crates/dialect-intel-xe)**) for Intel XE graphics and related accelerators
  - [ ] [spir-v](https://mlir.llvm.org/docs/Dialects/SPIR-V/) (**[CRATE](./crates/dialect-spirv)**) for direct low-level gpgpu support, superceeds other gpu dialects, with various outcomes 
 
 ### Internal crates
 
- - [ ] [mlir-codegen](./crates/mlir-codegen) macro generates respective dialect bindings from parsed tablegen files
- - [ ] [tablegen](./crates/tablegen) files parser in [winnow](https://github.com/winnow-rs/winnow)
- - [ ] [læra að fljúga](./crates/laera-fljuga) is a machine learning framework for *fljúga handahófi*, provides [ML program](https://mlir.llvm.org/docs/Dialects/MLProgramOps/) bindings
+ - :construction: [mlir-codegen](./crates/mlir-codegen) macro generates respective dialect bindings from parsed tablegen files
+ - :construction: [tablegen](./crates/tablegen) files parser in [winnow](https://github.com/winnow-rs/winnow)
+ - [ ] [læra að fljúga](./crates/laera-fljuga) is a machine learning and linear algebra framework for *fljúga handahófi*, 
+   provides [ML program](https://mlir.llvm.org/docs/Dialects/MLProgramOps/) and [linalg](https://mlir.llvm.org/docs/Dialects/Linalg/) bindings
+ - [ ] [læra að hekla](./crates/laera-hekla) is a distributed computing framework, provides basic scheduling and redundancy primitives, OpenMP and MPI dialect bindings 
+
 ## Development
 
 Install [asdf](https://asdf-vm.com/) first.
 
 ```bash
+# asuming you've cloned the repo to ~/src/fljuga-handahofi
+# the ~/.rustup/toolchain path for `rustc_codegen_ssa` is hardcoded in `Cargo.toml`,
+# so you might want to change it manually on `macos` or arm architectures
+
 asdf plugin add rust
+asdf plugin add golang
+asdf plugin add python
 asdf install
 asdf current # should list all the correct versions from .tools-versions file
 
@@ -82,6 +95,21 @@ rustup default nightly # fljúga handahófi may switch to stable in the future
 rustup component add clippy-preview
 rustup component add rustfmt
 cargo install cargo-run-bin
+
+# double check that rust sources are available and change `Cargo.toml` path, if nescessary
+rust_nightly_date="2024-11-22" # rustc 1.84.0
+rustup install "nightly-${rust_nightly_date}" 
+rustup toolchain install "nightly-${rust_nightly_date}" --component rust-src
+rustup toolchain install "nightly-${rust_nightly_date}" --component rustc-dev
+rustup toolchain install "nightly-${rust_nightly_date}" --component llvm-tools-preview
+
+toolchain=`rustup show | grep fljuga-handahofi/rust-toolchain | awk '{ print $1; }'`
+current_ssa_path=`grep "rustc_codegen_ssa" Cargo.toml | head -n 1 | awk '{ print $6; }'`
+fetched_ssa_path="../../.rustup/toolchains/$toolchain/lib/rustlib/rustc-src/rust/compiler/rustc_codegen_ssa"
+[ "${current_ssa_path}" != "\"${fetched_ssa_path}\"" ] && \
+  echo -e "Change \`Cargo.toml\` rustc_codegen_ssa path \n  $current_ssa_path \nto\n  \"$fetched_ssa_path\""
+
+cargo build
 
 cargo bin --install
 
@@ -93,11 +121,10 @@ echo ". \"\$HOME/.asdf/installs/rust/$(cat .tool-versions| grep rust | awk '{pri
 
 # Linting
 cargo bin licensure -i **/*.rs
-rustfmt --edition 2024 **/*.rs
+rustfmt --edition 2021 **/*.rs
 # commit changes
 cargo clippy --fix  
 ```
-
 
 ## License
 

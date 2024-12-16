@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
-//! ## fljúga handahófi shape dialect support.
+//! ## læra að hekla
 //!
-//! Implements mlir shape operations.
+//! fljúga handahófi distributed computation framework
+//!

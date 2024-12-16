@@ -1,2 +1,7 @@
+[attr]rust text eol=lf whitespace=tab-in-indent,trailing-space,tabwidth=4
+
 * text=auto eol=lf
 *.rs diff=rust
+*.rs rust diff=rust
+*.mir linguist-language=Rust
+Cargo.lock linguist-generated=false

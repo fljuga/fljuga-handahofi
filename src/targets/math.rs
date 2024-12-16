@@ -13,6 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
 //! ## fljúga handahófi MLIR internal math dialect support.
 //!
 //! Internal mlir Math operations beyond simple arithmetics - trigonometry, polynomials etc.

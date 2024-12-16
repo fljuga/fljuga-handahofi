@@ -1,0 +1,4 @@
+[toolchain]
+# channel = "nightly-2024-12-16" # switch to 1.85.0-nightly when 1.86.0 will be available
+channel = "nightly-2024-11-22" # 1.84.0-nightly
+components = ["rust-src", "rustc-dev", "llvm-tools-preview"]

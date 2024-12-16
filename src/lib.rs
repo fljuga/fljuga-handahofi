@@ -22,4 +22,9 @@
 //! It even targets hardware description languages with [circt](https://github.com/llvm/circt) project.
 //!
 
+#![feature(const_option)]
+
 mod targets;
+
+
+use rustc_codegen_ssa::traits::*;

@@ -2,29 +2,87 @@
 name = "fljuga-handahofi"
 version = "0.1.0"
 description = "reference rustc_codegen_mlir implementation"
-edition = "2024"
+edition = "2021"
 
 [lib]
 crate-type = ["dylib"]
 
+[dependencies]
+rustc_codegen_ssa = { path = "../../.rustup/toolchains/nightly-2024-11-22-x86_64-unknown-linux-gnu/lib/rustlib/rustc-src/rust/compiler/rustc_codegen_ssa" }
+# Specify path manually for other platforms
+# rustc_codegen_ssa = { path = "../../.rustup/toolchains/nightly-2024-11-22-aarch64-unknown-linux-gnu/lib/rustlib/rustc-src/rust/compiler/rustc_codegen_ssa" }
+fljuga-handahofi-dialect-amdgpu = { path = "./crates/dialect-amdgpu", optional = true}
+fljuga-handahofi-dialect-emit-c = { path = "./crates/dialect-emit-c", optional = true}
+fljuga-handahofi-dialect-intel-amx = { path = "./crates/dialect-intel-amx", optional = true}
+fljuga-handahofi-dialect-intel-xe = { path = "./crates/dialect-intel-xe", optional = true}
+fljuga-handahofi-dialect-mpi = { path = "./crates/dialect-mpi", optional = true}
+fljuga-handahofi-dialect-nvgpu = { path = "./crates/dialect-nvgpu", optional = true}
+fljuga-handahofi-dialect-nvvm = { path = "./crates/dialect-nvvm", optional = true}
+fljuga-handahofi-dialect-omp = { path = "./crates/dialect-omp", optional = true}
+fljuga-handahofi-dialect-openacc = { path = "./crates/dialect-openacc", optional = true}
+fljuga-handahofi-dialect-rocdl = { path = "./crates/dialect-rocdl", optional = true}
+fljuga-handahofi-dialect-spirv = { path = "./crates/dialect-spirv", optional = true}
+fljuga-handahofi-laera-fljuga = { path = "./crates/laera-fljuga", optional = true}
+fljuga-handahofi-laera-hekla = { path = "./crates/laera-hekla", optional = true}
+
+
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+fljuga-handahofi-dialect-x86-vector = { path = "./crates/dialect-x86-vector", optional = true}
+
+[target.'cfg(target_arch = "riscv64")'.dependencies]
+fljuga-handahofi-dialect-riscv-vcix = { path = "./crates/dialect-riscv-vcix", optional = true}
+
+[target.'cfg(target_os)'.dependencies]
+fljuga-handahofi-dialect-riscv-vcix = { path = "./crates/dialect-riscv-vcix", optional = true}
+
+[target.'cfg(target_arch = "arm")'.dependencies]
+fljuga-handahofi-dialect-arm-neon = { path = "./crates/dialect-arm-neon", optional = true}
+fljuga-handahofi-dialect-arm-sme = { path = "./crates/dialect-arm-sme", optional = true}
+fljuga-handahofi-dialect-arm-sve = { path = "./crates/dialect-arm-sve", optional = true}
+
+[features]
+nvgpu = ["fljuga-handahofi-dialect-nvgpu", "fljuga-handahofi-dialect-nvvm"]
+amdgpu = ["fljuga-handahofi-dialect-amdgpu", "fljuga-handahofi-dialect-rocdl"]
+intelgpu = ["fljuga-handahofi-dialect-intel-xe"]
+spirv = ["fljuga-handahofi-dialect-spirv"]
+gpu = ["nvgpu", "amdgpu", "intelgpu", "spirv"]
+intelamx = ["fljuga-handahofi-dialect-intel-amx"]
+x86 = ["fljuga-handahofi-dialect-x86-vector"]
+riscv = ["fljuga-handahofi-dialect-riscv-vcix"]
+arm7 = ["fljuga-handahofi-dialect-arm-neon"]
+arm8 = ["fljuga-handahofi-dialect-arm-neon", "fljuga-handahofi-dialect-arm-sve"]
+arm9 = ["fljuga-handahofi-dialect-arm-neon", "fljuga-handahofi-dialect-arm-sve", "fljuga-handahofi-dialect-arm-sme"]
+arm = ["arm9"]
+c = ["fljuga-handahofi-dialect-emit-c"]
+hpc = ["fljuga-handahofi-dialect-mpi", "fljuga-handahofi-dialect-omp", "fljuga-handahofi-dialect-openacc"]
+ml = ["x86", "arm", "spirv", "gpu", "fljuga-handahofi-laera-fljuga"]
+distributed = ["hpc", "ml", "fljuga-handahofi-laera-hekla"]
+
+default = ["distributed"]
+
 [workspace]
-members = ["crates/*"]
+members = [
+    "crates/dialect-*",
+    "crates/laera-*",
+    "crates/mlir-codegen",
+    "crates/tablegen"
+]
 
 [workspace.package]
 authors = ["Yuriy Yarosh <yuriy@yarosh.dev>"]
 license = "Apache-2.0"
 repository = "https://github.com/fljuga/fljuga-handahofi"
 documentation = ""
-edition = "2024"
+edition = "2021"
 
 [workspace.dependencies]
 winnow = "^0.6"
 bytes = "*"
 http-body-util = "*"
 hyper = { version = "^1.5", features = ["client", "http1", "http2"] }
-hyper-rustls = { version = "^0.27", features = ["http2", "fips"] }
+hyper-rustls = { version = "^0.27", features = ["http2"] }
 hyper-util = { version = "^0.1", features = ["full"] }
-rustls = { version = "^0.23", features = ["tls12", "fips"] }
+rustls = { version = "^0.23", features = ["tls12"] }
 tokio = { version = "^1.41", features = ["full"] }
 thiserror = "^2"
 webpki-roots = "*"
