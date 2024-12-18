@@ -14,22 +14,27 @@
    limitations under the License.
 */
 
-//! ## fljúga handahófi tablegen
 //!
-//! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
-//! a code generator targeting [LLVM MLIR](https://mlir.llvm.org/) Transformations and Dialects.
-//!
-//! Common Tablegen expressions.
+//! Tablegen bang operator parsing.
 //!
 
+use winnow::PResult;
 use winnow::ascii::*;
 use winnow::combinator::*;
 use winnow::error::*;
-use winnow::stream::Stream;
+use winnow::stream::AsChar;
+use winnow::token::*;
 use winnow::*;
 
-pub(crate) mod class_def;
-pub(crate) mod let_expression;
-pub(crate) mod record_def;
-pub(crate) mod values;
-pub(crate) mod ranges;
+
+/// Parses bang operators.
+pub(crate) fn bang_operator<'a>(input: &mut &'a str) -> PResult<&'a str> {
+    preceded("!", take_while(1.., AsChar::is_alpha)).parse_next(input)
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    use crate::grammar::tokens::helpers::tests::*;
+}

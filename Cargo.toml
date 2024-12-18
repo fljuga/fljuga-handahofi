@@ -1,7 +1,7 @@
 [package]
-name = "fljuga-handahofi"
+name = "rustc_codegen_mlir"
 version = "0.1.0"
-description = "reference rustc_codegen_mlir implementation"
+description = "fljuga-handahofi reference rustc_codegen_mlir implementation"
 edition = "2021"
 
 [lib]
@@ -9,7 +9,7 @@ crate-type = ["dylib"]
 
 [dependencies]
 rustc_codegen_ssa = { path = "../../.rustup/toolchains/nightly-2024-11-22-x86_64-unknown-linux-gnu/lib/rustlib/rustc-src/rust/compiler/rustc_codegen_ssa" }
-# Specify path manually for other platforms
+# Specify path manually for other platforms and os
 # rustc_codegen_ssa = { path = "../../.rustup/toolchains/nightly-2024-11-22-aarch64-unknown-linux-gnu/lib/rustlib/rustc-src/rust/compiler/rustc_codegen_ssa" }
 fljuga-handahofi-dialect-amdgpu = { path = "./crates/dialect-amdgpu", optional = true}
 fljuga-handahofi-dialect-emit-c = { path = "./crates/dialect-emit-c", optional = true}
@@ -24,7 +24,6 @@ fljuga-handahofi-dialect-rocdl = { path = "./crates/dialect-rocdl", optional = t
 fljuga-handahofi-dialect-spirv = { path = "./crates/dialect-spirv", optional = true}
 fljuga-handahofi-laera-fljuga = { path = "./crates/laera-fljuga", optional = true}
 fljuga-handahofi-laera-hekla = { path = "./crates/laera-hekla", optional = true}
-
 
 [target.'cfg(target_arch = "x86_64")'.dependencies]
 fljuga-handahofi-dialect-x86-vector = { path = "./crates/dialect-x86-vector", optional = true}

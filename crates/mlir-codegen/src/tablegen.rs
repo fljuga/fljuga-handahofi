@@ -121,6 +121,7 @@ mod tests {
     use super::*;
     use once_cell::sync::Lazy;
     use tokio::sync::Mutex;
+    use fljuga_handahofi_tablegen::parse;
 
     static TEST_FIXTURES_DIR: Lazy<Mutex<&Path>> =
         Lazy::new(|| Mutex::new(Path::new("./.fixtures")));
@@ -172,5 +173,9 @@ mod tests {
     async fn should_parse_tablegen_files() {
         let downloaded_files = tablegen_fixtures().await;
         assert!(downloaded_files.len() > 0);
+
+        for contents in downloaded_files {
+            // assert!(parse(contents.as_str()))
+        }
     }
 }

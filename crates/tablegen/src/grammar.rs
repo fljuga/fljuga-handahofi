@@ -22,6 +22,16 @@
 //! *fljuga-handahofi-tablegen* implements a [winnow] parser for LLVM Tablegen files.
 //!
 
+use winnow::PResult;
+use winnow::ascii::*;
+use winnow::combinator::*;
+use winnow::combinator::*;
+use winnow::error::*;
+use winnow::error::*;
+use winnow::stream::{AsChar, Stream};
+use winnow::token::*;
+use winnow::*;
+
 mod expressions;
 mod tokens;
 
@@ -30,8 +40,15 @@ pub struct TableGen<'a> {
     pub(crate) name: &'a str,
 }
 
+// fn range_value_piece<'a>(input: &mut &'a str) -> PResult<(&'a str, &'a str)> {
+//     alt((
+//         (crate::grammar::expressions::values::value, internal::spaced("..."), crate::grammar::expressions::values::value),
+//     ))
+//         .map(|(a, _, b)| (a, b))
+//         .parse_next(input)
+// }
+
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn should_parse_numbers() {}
+    use super::*;
 }

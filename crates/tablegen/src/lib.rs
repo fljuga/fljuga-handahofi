@@ -24,6 +24,8 @@
 
 mod grammar;
 
-fn parse_tablegen<'a>(str: &'a str) -> grammar::TableGen<'a> {
-    grammar::TableGen::<'a> { name: "r" }
+use winnow::PResult;
+
+pub fn parse<'a>(str: &'a str) -> PResult<grammar::TableGen<'a>> {
+    Ok(grammar::TableGen::<'a> { name: "r" })
 }

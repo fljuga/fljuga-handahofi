@@ -1,15 +1,22 @@
 # fljúga handahófi
 
-*fljúga handahófi* is a *rust_codegen_mlir* implementation.
+*fljúga handahófi* is a *rustc_codegen_mlir* implementation.
 
 ## STATUS: WIP
 
 ## Usage
 
-Is fairly similar to [cranelift]() compiler.
+Is fairly similar to [cranelift](https://github.com/rust-lang/rustc_codegen_cranelift) compiler.
 
 ```bash
 
+# build fljúga handahófi
+cargo build
+
+# copy the lib into your current nightly 
+cp target/release
+
+CARGO_PROFILE_DEV_CODEGEN_BACKEND=mlir cargo +nightly build -Zcodegen-backend
 ```
 
 ## [Documentation](./doc)
@@ -129,4 +136,3 @@ cargo clippy --fix
 ## License
 
 *fljúga handahófi* is licensed under the terms of [Apache License, Version 2.0](LICENSE), because patents and liability claims are a pain.
-

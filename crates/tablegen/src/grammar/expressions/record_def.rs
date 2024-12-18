@@ -24,12 +24,12 @@ use winnow::stream::{AsChar, Stream};
 use winnow::token::*;
 use winnow::*;
 
-use crate::grammar::tokens::internal;
+use crate::grammar::tokens::helpers;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use internal::tests::*;
+    use helpers::tests::*;
 
     #[test]
     fn should_parse_record_def() {

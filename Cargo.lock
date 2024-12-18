@@ -503,31 +503,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fljuga-handahofi"
-version = "0.1.0"
-dependencies = [
- "fljuga-handahofi-dialect-amdgpu",
- "fljuga-handahofi-dialect-arm-neon",
- "fljuga-handahofi-dialect-arm-sme",
- "fljuga-handahofi-dialect-arm-sve",
- "fljuga-handahofi-dialect-emit-c",
- "fljuga-handahofi-dialect-intel-amx",
- "fljuga-handahofi-dialect-intel-xe",
- "fljuga-handahofi-dialect-mpi",
- "fljuga-handahofi-dialect-nvgpu",
- "fljuga-handahofi-dialect-nvvm",
- "fljuga-handahofi-dialect-omp",
- "fljuga-handahofi-dialect-openacc",
- "fljuga-handahofi-dialect-riscv-vcix",
- "fljuga-handahofi-dialect-rocdl",
- "fljuga-handahofi-dialect-spirv",
- "fljuga-handahofi-dialect-x86-vector",
- "fljuga-handahofi-laera-fljuga",
- "fljuga-handahofi-laera-hekla",
- "rustc_codegen_ssa",
-]
-
-[[package]]
 name = "fljuga-handahofi-dialect-amdgpu"
 version = "0.1.0"
 dependencies = [
@@ -1758,6 +1733,31 @@ dependencies = [
  "icu_locid_transform",
  "icu_provider",
  "zerovec",
+]
+
+[[package]]
+name = "rustc_codegen_mlir"
+version = "0.1.0"
+dependencies = [
+ "fljuga-handahofi-dialect-amdgpu",
+ "fljuga-handahofi-dialect-arm-neon",
+ "fljuga-handahofi-dialect-arm-sme",
+ "fljuga-handahofi-dialect-arm-sve",
+ "fljuga-handahofi-dialect-emit-c",
+ "fljuga-handahofi-dialect-intel-amx",
+ "fljuga-handahofi-dialect-intel-xe",
+ "fljuga-handahofi-dialect-mpi",
+ "fljuga-handahofi-dialect-nvgpu",
+ "fljuga-handahofi-dialect-nvvm",
+ "fljuga-handahofi-dialect-omp",
+ "fljuga-handahofi-dialect-openacc",
+ "fljuga-handahofi-dialect-riscv-vcix",
+ "fljuga-handahofi-dialect-rocdl",
+ "fljuga-handahofi-dialect-spirv",
+ "fljuga-handahofi-dialect-x86-vector",
+ "fljuga-handahofi-laera-fljuga",
+ "fljuga-handahofi-laera-hekla",
+ "rustc_codegen_ssa",
 ]
 
 [[package]]

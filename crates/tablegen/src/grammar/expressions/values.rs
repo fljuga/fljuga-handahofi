@@ -24,9 +24,10 @@ use winnow::stream::{AsChar, Stream};
 use winnow::token::*;
 use winnow::*;
 
-use crate::grammar::tokens::internal;
+use crate::grammar::tokens::helpers;
+use crate::grammar::expressions::ranges::*;
 
-fn value<'a>(input: &mut &'a str) -> PResult<&'a str> {
+pub fn value<'a>(input: &mut &'a str) -> PResult<&'a str> {
     simple_value.parse_next(input)
     // (
     //     simple_value,
@@ -35,40 +36,12 @@ fn value<'a>(input: &mut &'a str) -> PResult<&'a str> {
     // // .map(|(a, b): (&str, Vec<&str>)| a)
 }
 
-fn simple_value<'a>(input: &mut &'a str) -> PResult<&'a str> {
+pub(crate) fn simple_value<'a>(input: &mut &'a str) -> PResult<&'a str> {
     "x".parse_next(input)
 }
 
-fn value_suffix(input: &mut &str) -> PResult<Vec<(i64, i64)>> {
+pub(crate) fn value_suffix(input: &mut &str) -> PResult<Vec<(i64, i64)>> {
     delimited("{", range_list, "}").parse_next(input)
-}
-
-fn range_list(input: &mut &str) -> PResult<Vec<(i64, i64)>> {
-    repeat(1.., range_int_piece).parse_next(input)
-}
-
-fn range_int_piece(input: &mut &str) -> PResult<(i64, i64)> {
-    alt((
-        (internal::int, internal::spaced("..."), internal::int),
-        (
-            internal::int,
-            take_while(1.., AsChar::is_space),
-            internal::int,
-        ),
-        (internal::int, internal::spaced("-"), internal::int),
-    ))
-    .map(|(a, _, b)| (a, b))
-    .parse_next(input)
-}
-
-fn range_value_piece<'a>(input: &mut &'a str) -> PResult<(&'a str, &'a str)> {
-    alt((
-        (value, internal::spaced("..."), value),
-        (value, take_while(1.., AsChar::is_space), value),
-        (value, internal::spaced("-"), value),
-    ))
-    .map(|(a, _, b)| (a, b))
-    .parse_next(input)
 }
 
 // fn slice_elements<'a>(input: &mut &'a str) -> PResult<&'a str> {
@@ -82,7 +55,7 @@ fn range_value_piece<'a>(input: &mut &'a str) -> PResult<(&'a str, &'a str)> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use internal::tests::*;
+    use helpers::tests::*;
 
     #[test]
     fn should_parse_ranges() {
