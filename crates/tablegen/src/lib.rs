@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2022-2024 Yuriy Yarosh.
+   Copyright (C) 2022-2025 Yuriy Yarosh.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,6 +26,6 @@ mod grammar;
 
 use winnow::PResult;
 
-pub fn parse<'a>(str: &'a str) -> PResult<grammar::TableGen<'a>> {
+pub fn parse<'a>(input: &'a str) -> PResult<grammar::TableGen<'a>> {
     Ok(grammar::TableGen::<'a> { name: "r" })
 }

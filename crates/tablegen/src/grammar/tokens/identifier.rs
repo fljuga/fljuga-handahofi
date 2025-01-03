@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2022-2024 Yuriy Yarosh.
+   Copyright (C) 2022-2025 Yuriy Yarosh.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -75,8 +75,7 @@ pub(crate) fn identifier<'a>(input: &mut &'a str) -> PResult<&'a str> {
             alpha_identifier_chars1 as StrParser<'a>,
             digit_identifier_chars0 as StrParser<'a>,
         ],
-        input,
-    )?;
+    ).parse_next(input)?;
 
     if RESERVED_WORDS.contains(&id) {
         Err(ErrMode::from_error_kind(&id, ErrorKind::Fail))
@@ -84,7 +83,6 @@ pub(crate) fn identifier<'a>(input: &mut &'a str) -> PResult<&'a str> {
         Ok(id)
     }
 }
-
 
 #[cfg(test)]
 pub mod tests {

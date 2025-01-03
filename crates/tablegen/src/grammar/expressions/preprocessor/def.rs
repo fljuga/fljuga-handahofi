@@ -14,6 +14,19 @@
    limitations under the License.
 */
 
-//! ## fljúga handahófi MLIR single variable polynomials dialect support.
 //!
-//! Implements single variable polynomial operations.
+//! Tablegen preprocessor defines parsing.
+//!
+
+use winnow::PResult;
+use winnow::ascii::*;
+use winnow::combinator::*;
+use winnow::error::*;
+use winnow::stream::AsChar;
+use winnow::token::*;
+use winnow::*;
+
+#[derive(Debug, PartialEq, Clone)]
+pub(crate) struct Define<'a> {
+    name: &'a str,
+}

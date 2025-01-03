@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2022-2024 Yuriy Yarosh.
+   Copyright (C) 2022-2025 Yuriy Yarosh.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,13 +23,19 @@
 //!
 
 pub(crate) mod bang_operator;
+
 pub(crate) mod comments;
+
 pub(crate) mod digits;
+
 pub(crate) mod helpers;
+
 pub(crate) mod identifier;
-pub(crate) mod preprocessor_directive;
+
 pub(crate) mod strings;
+
 pub(crate) mod type_name;
+
 pub(crate) mod variable;
 
 #[cfg(test)]

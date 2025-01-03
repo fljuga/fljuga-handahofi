@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2022-2024 Yuriy Yarosh.
+   Copyright (C) 2022-2025 Yuriy Yarosh.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ use winnow::combinator::*;
 use winnow::error::*;
 use winnow::error::*;
 use winnow::stream::{AsChar, Stream};
-use winnow::token::*;
 use winnow::*;
 
 use crate::grammar::tokens::helpers;

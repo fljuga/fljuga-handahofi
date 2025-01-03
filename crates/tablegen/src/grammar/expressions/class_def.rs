@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2022-2024 Yuriy Yarosh.
+   Copyright (C) 2022-2025 Yuriy Yarosh.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
    limitations under the License.
 */
 
-use winnow::PResult;
-use winnow::ascii::*;
-use winnow::combinator::*;
-use winnow::combinator::*;
-use winnow::error::*;
-use winnow::error::*;
-use winnow::stream::{AsChar, Stream};
-use winnow::token::*;
-use winnow::*;
+//!
+//! Tablegen class definitions parsing.
+//!
 
-use crate::grammar::tokens::helpers;
+// use winnow::PResult;
+// use winnow::ascii::*;
+// use winnow::combinator::*;
+// use winnow::error::*;
+// use winnow::stream::{AsChar, Stream};
+// use winnow::token::*;
+// use winnow::*;
+
+// use crate::grammar::tokens::helpers;
 
 #[derive(Debug)]
 struct ClassDefinition<'a> {
@@ -53,8 +55,7 @@ struct ClassProperty<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use helpers::tests::*;
+    // use super::*;
 
     #[test]
     fn should_parse_class_def() {

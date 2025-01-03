@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2022-2024 Yuriy Yarosh.
+   Copyright (C) 2022-2025 Yuriy Yarosh.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -35,15 +35,12 @@ pub(crate) fn variable_name_chars<'a>(input: &mut &'a str) -> PResult<&'a str> {
             alpha_identifier_chars1 as StrParser<'a>,
             digit_identifier_chars0 as StrParser<'a>,
         ],
-        input,
-    )
+    ).parse_next(input)
 }
 
 fn variable_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
     preceded('$', variable_name_chars).parse_next(input)
 }
-
-
 
 #[cfg(test)]
 pub mod tests {
