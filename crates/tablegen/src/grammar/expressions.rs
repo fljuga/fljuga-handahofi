@@ -36,5 +36,5 @@ pub(crate) mod record_def;
 
 pub(crate) mod values;
 
+pub(crate) mod preprocessor;
 pub(crate) mod ranges;
-mod preprocessor;

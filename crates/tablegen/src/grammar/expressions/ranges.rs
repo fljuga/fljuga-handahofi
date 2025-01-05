@@ -18,16 +18,14 @@
 //! Tablegen ranges parsing.
 //!
 
-use winnow::PResult;
-use winnow::ascii::*;
 use winnow::combinator::*;
-use winnow::error::*;
 use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
 
-use crate::grammar::tokens::helpers::*;
 use crate::grammar::tokens::digits::*;
+use crate::grammar::tokens::helpers::*;
 
 use crate::grammar::expressions::values::*;
 
@@ -38,15 +36,11 @@ pub(crate) fn range_list(input: &mut &str) -> PResult<Vec<(i64, i64)>> {
 pub(crate) fn range_int_piece(input: &mut &str) -> PResult<(i64, i64)> {
     alt((
         (int, spaced("..."), int),
-        (
-            int,
-            take_while(1.., AsChar::is_space),
-            int,
-        ),
+        (int, take_while(1.., AsChar::is_space), int),
         (int, spaced("-"), int),
     ))
-        .map(|(a, _, b)| (a, b))
-        .parse_next(input)
+    .map(|(a, _, b)| (a, b))
+    .parse_next(input)
 }
 
 pub(crate) fn range_value_piece<'a>(input: &mut &'a str) -> PResult<(&'a str, &'a str)> {
@@ -55,6 +49,6 @@ pub(crate) fn range_value_piece<'a>(input: &mut &'a str) -> PResult<(&'a str, &'
         (value, take_while(1.., AsChar::is_space), value),
         (value, spaced("-"), value),
     ))
-        .map(|(a, _, b)| (a, b))
-        .parse_next(input)
+    .map(|(a, _, b)| (a, b))
+    .parse_next(input)
 }

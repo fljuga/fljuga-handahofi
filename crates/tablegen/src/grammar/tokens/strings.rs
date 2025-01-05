@@ -18,12 +18,9 @@
 //! Tablegen strings parsing.
 //!
 
-use winnow::PResult;
-use winnow::ascii::*;
 use winnow::combinator::*;
-use winnow::error::*;
-use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
 
 fn string<'a>(input: &mut &'a str) -> PResult<&'a str> {
@@ -35,7 +32,7 @@ fn code<'a>(input: &mut &'a str) -> PResult<&'a str> {
         "[{",
         terminated(take_while(1.., |c: char| !"[{}]".contains(c)), "}]"),
     )
-        .parse_next(input)
+    .parse_next(input)
 }
 
 #[cfg(test)]

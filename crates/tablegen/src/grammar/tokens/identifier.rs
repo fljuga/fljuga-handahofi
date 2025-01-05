@@ -18,12 +18,9 @@
 //! Tablegen identifiers parsing.
 //!
 
-use winnow::PResult;
-use winnow::ascii::*;
-use winnow::combinator::*;
 use winnow::error::*;
-use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
 
 use crate::grammar::tokens::helpers::*;
@@ -56,7 +53,6 @@ const RESERVED_WORDS: [&str; 25] = [
     "true",
 ];
 
-
 /// Parses identifier alpha+ chars including underscore.
 pub(crate) fn alpha_identifier_chars1<'a>(input: &mut &'a str) -> PResult<&'a str> {
     take_while(1.., ('a'..='z', 'A'..='Z', '_')).parse_next(input)
@@ -67,15 +63,13 @@ pub(crate) fn digit_identifier_chars0<'a>(input: &mut &'a str) -> PResult<&'a st
     take_while(0.., '0'..='9').parse_next(input)
 }
 
-
 pub(crate) fn identifier<'a>(input: &mut &'a str) -> PResult<&'a str> {
-    let id = concat(
-        [
-            digit_identifier_chars0 as StrParser<'a>,
-            alpha_identifier_chars1 as StrParser<'a>,
-            digit_identifier_chars0 as StrParser<'a>,
-        ],
-    ).parse_next(input)?;
+    let id = concat([
+        digit_identifier_chars0 as StrParser<'a>,
+        alpha_identifier_chars1 as StrParser<'a>,
+        digit_identifier_chars0 as StrParser<'a>,
+    ])
+    .parse_next(input)?;
 
     if RESERVED_WORDS.contains(&id) {
         Err(ErrMode::from_error_kind(&id, ErrorKind::Fail))
@@ -91,7 +85,6 @@ pub mod tests {
 
     #[test]
     fn should_parse_identifiers() {
-
         test_parser(
             vec![
                 ("01id", Some("01id"), ""),   // Valid prefixed identifier, fully consumed

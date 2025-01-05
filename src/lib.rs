@@ -26,5 +26,4 @@
 
 mod targets;
 
-
 use rustc_codegen_ssa::traits::*;

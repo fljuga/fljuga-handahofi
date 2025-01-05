@@ -12,8 +12,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
-//! ## fljúga handahófi mlir codegen
+*///! ## fljúga handahófi mlir codegen
 //!
 //! *fljúga handahófi* is a reference implementation of *rustc_codegen_mlir*,
 //! a code generator targeting [LLVM MLIR](https://mlir.llvm.org/) Transformations and Dialects.

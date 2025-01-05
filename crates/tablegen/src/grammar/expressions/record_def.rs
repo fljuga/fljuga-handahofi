@@ -24,12 +24,10 @@
 // use winnow::token::*;
 // use winnow::*;
 
-use crate::grammar::tokens::helpers;
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use helpers::tests::*;
+    use crate::grammar::tokens::helpers::tests::*;
 
     #[test]
     fn should_parse_record_def() {

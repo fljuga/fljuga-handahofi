@@ -18,14 +18,11 @@
 //! Tablegen bang operator parsing.
 //!
 
-use winnow::PResult;
-use winnow::ascii::*;
 use winnow::combinator::*;
-use winnow::error::*;
 use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
-
 
 /// Parses bang operators.
 pub(crate) fn bang_operator<'a>(input: &mut &'a str) -> PResult<&'a str> {

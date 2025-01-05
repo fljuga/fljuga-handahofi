@@ -11,6 +11,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 winnow.workspace = true
+mutants.workspace = true
 
 [lints]
 workspace = true

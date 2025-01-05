@@ -12,8 +12,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
-//! ## fljúga handahófi nvgpu dialect support
+*///! ## fljúga handahófi nvgpu dialect support
 //!
 //! Implements nvgpu mlir high level dialect support.
 //! nvgpu abstracts nvvm dialect with Device-specific PTX Asm instructions.

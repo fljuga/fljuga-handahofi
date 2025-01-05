@@ -12,8 +12,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
-//! ## fljúga handahófi RISC-V SiFive VCIX dialect support.
+*///! ## fljúga handahófi RISC-V SiFive VCIX dialect support.
 //!
 //! [SiFive VCIX](https://www.sifive.com/document-file/sifive-vector-coprocessor-interface-vcix-software)
 //! SIMD dialect implements the most basic simd operations for RISC-V processors.

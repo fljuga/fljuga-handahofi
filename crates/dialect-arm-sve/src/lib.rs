@@ -12,8 +12,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
-//! ## fljúga handahófi ARM SVE dialect support.
+*///! ## fljúga handahófi ARM SVE dialect support.
 //!
 //! [ARM SVE](https://developer.arm.com/Architectures/Scalable%20Vector%20Extensions) SIMD dialect implements modern simd operations for ARMv9+ instruction sets.
 //!

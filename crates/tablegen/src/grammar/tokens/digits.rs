@@ -18,12 +18,11 @@
 //! Tablegen digits parsing.
 //!
 
-use winnow::PResult;
 use winnow::ascii::*;
 use winnow::combinator::*;
-use winnow::error::*;
 use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
 
 /// Parses 0..1+
@@ -38,7 +37,7 @@ pub(crate) fn hex_or_bin_i64(input: &mut &str) -> PResult<i64> {
         "0b" => bin_digit1.try_map(|s| i64::from_str_radix(s, 2)),
         _ => fail,
     )
-        .parse_next(input)
+    .parse_next(input)
 }
 
 /// Parses signed dec number.
@@ -68,14 +67,13 @@ pub(crate) fn dec_i64(input: &mut &str) -> PResult<i64> {
         dec_istr.try_map(|s: &str| s.parse::<i64>()),
         dec_ustr.try_map(|s: &str| s.parse::<i64>()),
     ))
-        .parse_next(input)
+    .parse_next(input)
 }
 
 /// Parses dec hex bin numbers into i64.
 pub(crate) fn int(input: &mut &str) -> PResult<i64> {
     alt((dec_i64, hex_or_bin_i64)).parse_next(input)
 }
-
 
 #[cfg(test)]
 pub mod tests {

@@ -101,7 +101,14 @@ asdf current # should list all the correct versions from .tools-versions file
 rustup default nightly # fljúga handahófi may switch to stable in the future
 rustup component add clippy-preview
 rustup component add rustfmt
-cargo install cargo-run-bin
+rustup component add miri
+
+cargo install grcov --locked # for RustRover coverage reports
+cargo install cargo-nextest --locked
+cargo install cargo-mutants --locked
+cargo install cargo-sonar --locked
+cargo install cargo-llvm-cov --locked
+cargo install licensure --locked
 
 # double check that rust sources are available and change `Cargo.toml` path, if nescessary
 rust_nightly_date="2024-11-22" # rustc 1.84.0
@@ -126,9 +133,20 @@ echo "export PATH=\"\$PATH:\$HOME/.cargo/bin\"" >> ~/.zshrc # or .bashrc
 # load rust env for the current rust version specified in .tools-versions file
 echo ". \"\$HOME/.asdf/installs/rust/$(cat .tool-versions| grep rust | awk '{print $2}')/env\"" >> ~/.zshrc # or .bashrc
 
-# Linting
-cargo bin licensure -i **/*.rs
-rustfmt --edition 2021 **/*.rs
+# Testing
+cargo nextest r --all  
+cargo mutants --workspace -j 32 # for mutation testing with 32 concurrent jobs
+cargo miri nextest run --all    # for miri mem-leak testing
+
+# Coverage reporting
+cargo llvm-cov --workspace --html --open
+
+# Linting & Formatting
+licensure -i crates/**/*.rs
+licensure -i src/**/*.rs
+rustfmt --edition 2021 crates/**/*.rs
+rustfmt --edition 2021 src/**/*.rs
+
 # commit changes
 cargo clippy --fix  
 ```

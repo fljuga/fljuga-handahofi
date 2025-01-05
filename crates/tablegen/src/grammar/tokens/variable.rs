@@ -18,24 +18,19 @@
 //! Tablegen variables parsing.
 //!
 
-use winnow::PResult;
-use winnow::ascii::*;
 use winnow::combinator::*;
-use winnow::error::*;
-use winnow::stream::AsChar;
-use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
 
 use crate::grammar::tokens::helpers::*;
 use crate::grammar::tokens::identifier::*;
 
 pub(crate) fn variable_name_chars<'a>(input: &mut &'a str) -> PResult<&'a str> {
-    concat(
-        [
-            alpha_identifier_chars1 as StrParser<'a>,
-            digit_identifier_chars0 as StrParser<'a>,
-        ],
-    ).parse_next(input)
+    concat([
+        alpha_identifier_chars1 as StrParser<'a>,
+        digit_identifier_chars0 as StrParser<'a>,
+    ])
+    .parse_next(input)
 }
 
 fn variable_name<'a>(input: &mut &'a str) -> PResult<&'a str> {

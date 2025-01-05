@@ -12,8 +12,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
-//! ## fljúga handahófi Intel AMX dialect support.
+*///! ## fljúga handahófi Intel AMX dialect support.
 //!
 //! Intel Advanced Matrix Extensions.
 //! TLDR; fancy XEON gold acceleration, a bit of a "special snowflake", but meh.

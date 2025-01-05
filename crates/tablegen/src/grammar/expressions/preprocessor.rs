@@ -15,130 +15,293 @@
 */
 
 //!
-//! Tablegen preprocessor parsing.
+//! Tablegen preprocessor chunk.
 //!
 
-mod chunk;
-mod def;
-
-use winnow::PResult;
-use winnow::ascii::*;
+use crate::grammar::tokens::comments::filter_comments;
+use crate::grammar::tokens::helpers::*;
+use std::collections::HashSet;
 use winnow::combinator::*;
 use winnow::error::*;
-use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
 
-use crate::grammar::tokens::helpers::*;
+#[derive(Debug, Clone, PartialEq)]
+enum ConditionType {
+    IfDef,
+    IfNDef,
+}
 
+#[derive(Debug, Clone)]
+struct EvalContext {
+    defines: HashSet<String>,
+}
 
-// fn process_conditional<'a>(
-//     state: &mut PreprocessorState<'a>,
-//     is_ifdef: bool,
-//     before: &'a str,
-//     name: &'a str,
-//     content: &'a str,
-// ) -> PResult<()> {
-//     state.process_chunk_defines(before)?;
-//
-//     let mut conditional_state = PreprocessorState::new();
-//     conditional_state.process_chunk_defines(content)?;
-//
-//     state.add_conditional(
-//         if is_ifdef { ConditionType::IfDef } else { ConditionType::IfNDef },
-//         name,
-//         conditional_state.chunks,
-//     );
-//
-//     Ok(())
-// }
-//
-// pub(crate) fn preprocess<'a>(input: &mut &'a str) -> PResult<String> {
-//     let mut state = PreprocessorState::new();
-//
-//     // Parse each conditional directive one at a time
-//     while !input.is_empty() {
-//         match alt((
-//             |i: &mut &'a str| parse_ifdef.map(|(before, (name, content))|
-//                 (before, true, name, content)).parse_next(i),
-//             |i: &mut &'a str| parse_ifndef.map(|(before, (name, content))|
-//                 (before, false, name, content)).parse_next(i)
-//         )).parse_next(input) {
-//             Ok((before, is_ifdef, name, content)) => {
-//                 process_conditional(&mut state, is_ifdef, before, name, content)?;
-//             },
-//             Err(_) => {
-//                 // No more conditional directives found, process remaining text
-//                 state.process_chunk_defines(input)?;
-//                 break;
-//             }
-//         }
-//     }
-//
-//     Ok(state.evaluate())
-// }
+impl EvalContext {
+    pub fn new() -> Self {
+        Self {
+            defines: HashSet::new(),
+        }
+    }
+}
 
+macro_rules! define_parse_cond {
+    ($name:ident, $condType:ident, $condition:expr) => {
+        pub(crate) fn $name<'a>(input: &mut &'a str) -> PResult<Chunk<'a>> {
+            let (name, mut content) = (delimited(
+                literal($condition),
+                (
+                    delimited(
+                        space_or_newline1,
+                        take_till_space_or_newline,
+                        space_or_newline0,
+                    ),
+                    any_string_terminated_eager(["#endif"]),
+                ),
+                "#endif",
+            ))
+            .parse_next(input)?;
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     #[test]
-//     fn test_chunk_accumulation() {
-//         let input = r#"
-// initial text
-// #define FOO bar
-// middle text
-// #ifdef FOO
-//     conditional text
-//     #define BAZ qux
-// #endif
-// final text"#;
-//
-//         let mut input_str = input;
-//         let mut state = PreprocessorState::new();
-//         state.process_chunk_defines(&mut input_str).unwrap();
-//
-//         assert!(matches!(state.chunks[0], Chunk::Text(_)));
-//         assert!(matches!(state.chunks[1], Chunk::Define(_, _)));
-//         assert!(matches!(state.chunks[2], Chunk::Text(_)));
-//     }
-//
-//     #[test]
-//     fn test_nested_chunks() {
-//         let input = r#"
-// #define FOO bar
-// #ifdef FOO
-//     #define BAZ qux
-//     content1
-//     #ifdef BAZ
-//         nested content
-//     #endif
-// #endif"#;
-//
-//         let mut input_str = input;
-//         let result = preprocess(&mut input_str).unwrap();
-//
-//         assert!(result.contains("content1"));
-//         assert!(result.contains("nested content"));
-//     }
-// }
+            let parsed_content = parse_chunks(&mut content)?;
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     use crate::grammar::tokens::helpers::tests::*;
-//
-//     #[test]
-//     fn should_parse_define_preprocessor_directives() {
-//         test_parser(
-//             vec![
-//                 ("#define name", Some(("", "name")), ""), // Valid preprocessor, fully consumed
-//                 ("content #define name leftovers", Some(("content ", "name")), "leftovers"), // Partially valid preprocessor input, stops before 'x'
-//                 ("", None, ""),                       // Empty input should fail
-//             ],
-//             parse_defines,
-//         );
-//     }
-// }
+            Ok(Chunk::Conditional {
+                name,
+                condition_type: ConditionType::$condType,
+                content: parsed_content,
+            })
+        }
+    };
+}
+
+define_parse_cond!(parse_ifdef, IfDef, "#ifdef");
+define_parse_cond!(parse_ifndef, IfNDef, "#ifndef");
+
+fn parse_define<'a>(input: &mut &'a str) -> PResult<Chunk<'a>> {
+    delimited(
+        ("#define", space_or_newline1),
+        take_till_space_or_newline,
+        space_or_newline0,
+    )
+    .parse_next(input)
+    .map(|name| Chunk::Define { name })
+}
+
+fn parse_text<'a>(input: &mut &'a str) -> PResult<Chunk<'a>> {
+    let text = take_till(1.., |c| c == '#').parse_next(input)?;
+    if text.is_empty() {
+        Err(ErrMode::Incomplete(Needed::Unknown))
+    } else {
+        let trimmed_text = text.trim();
+
+        Ok(Chunk::Text(text.trim()))
+    }
+}
+
+fn parse_chunks<'a>(input: &mut &'a str) -> PResult<Chunks<'a>> {
+    let mut chunks = Vec::new();
+
+    while !input.is_empty() {
+        let result = alt((parse_text, parse_define, parse_ifdef, parse_ifndef)).parse_next(input);
+
+        match result {
+            Ok(Chunk::Text(text)) if text.is_empty() => continue,
+            Ok(chunk) => chunks.push(chunk),
+            Err(e) => {
+                if !chunks.is_empty() {
+                    break;
+                }
+
+                return Err(e);
+            }
+        }
+    }
+
+    Ok(Chunks { chunks })
+}
+
+#[derive(Debug, Clone, PartialEq)]
+enum Chunk<'a> {
+    Text(&'a str),
+    Define {
+        name: &'a str,
+    },
+    Conditional {
+        name: &'a str,
+        condition_type: ConditionType,
+        content: Chunks<'a>,
+    },
+}
+
+impl<'a> Chunk<'a> {
+    fn eval_ctx(&self, ctx: &mut EvalContext) -> String {
+        match self {
+            Chunk::Text(text) => text.to_string(),
+            Chunk::Define { name } => {
+                ctx.defines.insert(name.to_string());
+                String::new()
+            }
+            Chunk::Conditional {
+                name,
+                condition_type,
+                content,
+            } => {
+                let is_defined = ctx.defines.contains(&name.to_string());
+                let should_include = match condition_type {
+                    ConditionType::IfDef => is_defined,
+                    ConditionType::IfNDef => !is_defined,
+                };
+
+                if should_include {
+                    content.eval_ctx(ctx)
+                } else {
+                    String::new()
+                }
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct Chunks<'a> {
+    chunks: Vec<Chunk<'a>>,
+}
+
+impl<'a> Chunks<'a> {
+    fn eval_ctx(&self, ctx: &mut EvalContext) -> String {
+        self.chunks
+            .iter()
+            .map(|chunk| chunk.eval_ctx(ctx))
+            .collect()
+    }
+}
+
+pub(crate) fn preprocess<'a>(input: &mut &'a str) -> PResult<&'a str> {
+    let mut ctx = EvalContext::new();
+    let mut filtered_comments = filter_comments(input)?;
+    let chunks = parse_chunks(&mut filtered_comments)?;
+    let result = chunks.eval_ctx(&mut ctx);
+    Ok(Box::leak(result.into_boxed_str()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::grammar::tokens::helpers::tests::*;
+
+    #[test]
+    fn should_parse_defines() {
+        test_parser(
+            vec![
+                ("#define NAME", Some(Chunk::Define { name: "NAME" }), ""), // Valid define, fully consumed
+                (
+                    "#define NAME \nxx",
+                    Some(Chunk::Define { name: "NAME" }),
+                    "xx",
+                ), // Partially valid define input, stops before '\nxx'
+                ("#define", None, ""), // Invalid define, consumed
+            ],
+            parse_define,
+        );
+    }
+
+    #[test]
+    fn should_parse_text() {
+        test_parser(
+            vec![
+                ("any", Some(Chunk::Text("any")), ""), // Valid text, fully consumed
+                (
+                    "before define \n#define NAME \nxx",
+                    Some(Chunk::Text("before define")),
+                    "#define NAME \nxx",
+                ), // Partially valid text input, stops before #define
+                ("#define", None, "#define"),          // Empty text
+            ],
+            parse_text,
+        );
+    }
+
+    #[test]
+    fn should_parse_ifdef() {
+        test_parser(
+            vec![
+                (
+                    "#ifdef NAME \nxx #endif",
+                    Some(Chunk::Conditional {
+                        name: "NAME",
+                        condition_type: ConditionType::IfDef,
+                        content: Chunks {
+                            chunks: vec![Chunk::Text("xx")],
+                        },
+                    }),
+                    "",
+                ),
+                (
+                    "#ifdef NAME\nsome content\n#endif",
+                    Some(Chunk::Conditional {
+                        name: "NAME",
+                        condition_type: ConditionType::IfDef,
+                        content: Chunks {
+                            chunks: vec![Chunk::Text("some content")],
+                        },
+                    }),
+                    "",
+                ),
+                (
+                    "#ifdef NAME\n#ifndef NAME2\nsome content\n#endif\n#endif",
+                    Some(Chunk::Conditional {
+                        name: "NAME",
+                        condition_type: ConditionType::IfDef,
+                        content: Chunks {
+                            chunks: vec![Chunk::Conditional {
+                                name: "NAME2",
+                                condition_type: ConditionType::IfNDef,
+                                content: Chunks {
+                                    chunks: vec![Chunk::Text("some content")],
+                                },
+                            }],
+                        },
+                    }),
+                    "",
+                ),
+                ("#ifdef", None, ""), // Invalid ifdef, consumed
+            ],
+            parse_ifdef,
+        );
+    }
+
+    #[test]
+    fn should_preprocess() {
+        test_parser(
+            vec![
+                (
+                    "#ifdef NAME\n#ifndef NAME2\nsome content\n#endif\n#endif",
+                    Some(""),
+                    "",
+                ), // Absent define
+                (
+                    "#define NAME\n#ifdef NAME\n#ifndef NAME2\nsome content\n#endif\n#endif",
+                    Some("some content"),
+                    "",
+                ), // Present define
+                (
+                    "#define NAME\n#ifdef NAME\ncontent\n#endif",
+                    Some("content"),
+                    "",
+                ), // Define and condition
+                (
+                    "#define NAME\n#ifdef NAME\n/* multiline */// single-line\ncontent\n#endif",
+                    Some("content"),
+                    "",
+                ), // Define and condition
+                (
+                    "#define NAME\n#ifdef NAME\n/* multiline */ // single-line\ncontent\n#endif",
+                    Some("content"),
+                    "",
+                ), // Define and condition
+            ],
+            preprocess,
+        );
+    }
+}

@@ -18,14 +18,12 @@
 //! Tablegen token parsing helpers and plumbing material.
 //!
 
-use winnow::PResult;
-use winnow::ascii::*;
 use winnow::combinator::*;
 use winnow::error::*;
 use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
-use winnow::stream::CompareResult::Error;
 
 pub type GenParserPtr<'a, T> = fn(&mut &'a str) -> PResult<&'a T>;
 
@@ -59,64 +57,69 @@ where
     }
 }
 
-/// Creates a parser for a static string surrounded by optional spaces.
-pub(crate) fn spaced<'a>(
-    literal_str: &'static str,
-) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
-    move |input: &mut &'a str| delimited(space0, literal(literal_str), space0).parse_next(input)
+/// Creates a parser for a static string surrounded by optional spaces or newlines.
+pub(crate) fn spaced<'a>(literal_str: &'static str) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
+    move |input: &mut &'a str| {
+        delimited(space_or_newline0, literal(literal_str), space_or_newline0).parse_next(input)
+    }
 }
 
+#[cfg_attr(test, mutants::skip)]
 /// Parses a substring until the last specified terminator is encountered, then consumes it skipping the terminator.
-pub(crate) fn any_string_terminated<'a, const N: usize>(
-    endings: [&'static str; N], eager: bool, skip_ending: bool
+fn any_string_terminated<'a, const N: usize>(
+    endings: [&'static str; N],
+    eager: bool,
 ) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
     move |input: &mut &'a str| {
         let mut end_pos = if eager { 0 } else { input.len() };
-        let mut offset_pos = 0;
         let mut found = false;
 
         for ending in &endings {
-            if let Some(pos) = input.find(ending) {
-                found = true;
-                if (eager && pos > end_pos) || (!eager && pos < end_pos) {
+            if let Some(pos) = if eager {
+                input.rfind(ending)
+            } else {
+                input.find(ending)
+            } {
+                if eager && pos > end_pos || !eager && pos < end_pos {
                     end_pos = pos;
-                    offset_pos = ending.len();
                 }
+                found = true;
             }
         }
 
         if !found {
             let matched = *input;
             *input = "";
-
-            if matched.is_empty() {
-                return Err(ErrMode::Incomplete(Needed::Unknown));
-            }
-
-            return Ok(matched);
+            return if matched.is_empty() {
+                Err(ErrMode::Incomplete(Needed::Unknown))
+            } else {
+                Ok(matched)
+            };
         }
 
         let (matched, remainder) = input.split_at(end_pos);
-        *input = if skip_ending { remainder.get(offset_pos..).unwrap_or("") } else { remainder };
-
+        *input = remainder;
         if matched.is_empty() {
-            return Err(ErrMode::Incomplete(Needed::Unknown));
+            Err(ErrMode::Incomplete(Needed::Unknown))
+        } else {
+            Ok(matched)
         }
-
-        Ok(matched)
     }
 }
 
+/// Parses a substring lazily until the last specified terminator is encountered, then consumes it optionally skipping the terminator.
 pub(crate) fn any_string_terminated_lazy<'a, const N: usize>(
-    endings: [&'static str; N], skip_ending: bool
+    endings: [&'static str; N],
 ) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
-    any_string_terminated(endings, false,skip_ending)
+    any_string_terminated(endings, false)
 }
 
+/// Parses a substring eagerly until the last specified terminator is encountered, then consumes it optionally skipping the terminator.
+/// Eager parsing does not work for chained terminators.
 pub(crate) fn any_string_terminated_eager<'a, const N: usize>(
-    endings: [&'static str; N], skip_ending: bool
+    endings: [&'static str; N],
 ) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
-    any_string_terminated(endings, true, skip_ending)
+    any_string_terminated(endings, true)
 }
 
 pub(crate) fn any_string<'a>(input: &mut &'a str) -> PResult<&'a str> {
@@ -124,7 +127,15 @@ pub(crate) fn any_string<'a>(input: &mut &'a str) -> PResult<&'a str> {
 }
 
 pub(crate) fn take_till_space_or_newline<'a>(input: &mut &'a str) -> PResult<&'a str> {
-    take_till(1.., |c| AsChar::is_newline(c) || AsChar::is_space(c) ).parse_next(input)
+    take_till(1.., |c| AsChar::is_newline(c) || AsChar::is_space(c)).parse_next(input)
+}
+
+pub(crate) fn space_or_newline0<'a>(input: &mut &'a str) -> PResult<&'a str> {
+    take_while(0.., |c| AsChar::is_newline(c) || AsChar::is_space(c)).parse_next(input)
+}
+
+pub(crate) fn space_or_newline1<'a>(input: &mut &'a str) -> PResult<&'a str> {
+    take_while(1.., |c| AsChar::is_newline(c) || AsChar::is_space(c)).parse_next(input)
 }
 
 #[cfg(test)]
@@ -169,9 +180,9 @@ pub mod tests {
     fn should_parse_any_string() {
         test_parser(
             vec![
-                ("ab", Some("ab"), ""), // Valid string, fully consumed
+                ("ab", Some("ab"), ""),     // Valid string, fully consumed
                 (" \n ", Some(" \n "), ""), // Valid string of space chars, fully consumed
-                ("", None, ""),         // Empty input should fail
+                ("", None, ""),             // Empty input should fail
             ],
             any_string,
         );
@@ -181,13 +192,30 @@ pub mod tests {
     fn should_parse_any_string_terminated_eager() {
         test_parser(
             vec![
-                ("ab", Some("ab"), ""), // Valid non-terminated string, fully consumed
-                ("ab##", Some("ab"), ""), // Valid string, fully consumed
-                (" \n## ", Some(" \n"), " "), // Valid string of space chars
-                (" \n! abc ##  ", Some(" \n! abc "), "  "), // Valid string of space chars, fully consumed
-                ("", None, ""),         // Empty input should fail
+                ("ab", Some("ab"), ""),         // Valid non-terminated string, fully consumed
+                ("ab##", Some("ab"), "##"),     // Valid string, fully consumed
+                (" \n## ", Some(" \n"), "## "), // Valid string of space chars
+                (" \n! abc ##  !", Some(" \n! abc ##  "), "!"), // Valid string of space chars, fully consumed
+                ("##", None, "##"), // Empty terminated input should fail
+                ("", None, ""),     // Empty input should fail
             ],
-            any_string_terminated_eager(["##", "!"], true),
+            any_string_terminated_eager(["##", "!"]),
+        );
+    }
+    #[test]
+    fn should_parse_any_string_terminated_lazy() {
+        test_parser(
+            vec![
+                ("ab", Some("ab"), ""),         // Valid non-terminated string, fully consumed
+                ("ab##", Some("ab"), "##"),     // Valid string, fully consumed
+                (" \n## ", Some(" \n"), "## "), // Valid string of space chars
+                (" \n! abc ##  !", Some(" \n"), "! abc ##  !"), // Valid string of space chars, fully consumed
+                ("!", None, "!"),     // Empty terminated input should fail
+                ("##", None, "##"),   // Empty terminated input should fail
+                ("##!", None, "##!"), // Empty terminated input should fail
+                ("", None, ""),       // Empty input should fail
+            ],
+            any_string_terminated_lazy(["##", "!"]),
         );
     }
 
@@ -195,9 +223,9 @@ pub mod tests {
     fn should_concatenate_parsers() {
         test_parser(
             vec![
-                ("ab", Some("ab"), ""), // Valid concatenation, fully consumed
+                ("ab", Some("ab"), ""),     // Valid concatenation, fully consumed
                 ("abxx", Some("ab"), "xx"), // Partially valid concatenation
-                ("", None, ""),                 // Empty input should fail
+                ("", None, ""),             // Empty input should fail
             ],
             concat([
                 (|input: &mut &str| literal("a").parse_next(input)) as StrParser,

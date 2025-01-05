@@ -18,12 +18,9 @@
 //! Tablegen token type name parsing.
 //!
 
-use winnow::PResult;
-use winnow::ascii::*;
 use winnow::combinator::*;
-use winnow::error::*;
-use winnow::stream::AsChar;
 use winnow::token::*;
+use winnow::PResult;
 use winnow::*;
 
 use crate::grammar::tokens::digits::*;
@@ -39,15 +36,12 @@ pub(crate) fn generic_type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
 
 fn type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
     alt((
-        "bit",
-        "int",
-        "string",
-        "dag",
+        "bit", "int", "string", "dag",
         // generic_bits_type_name,
         // generic_type_name,
         identifier,
     ))
-        .parse_next(input)
+    .parse_next(input)
 }
 
 #[cfg(test)]
