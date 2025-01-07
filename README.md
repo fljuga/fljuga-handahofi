@@ -136,7 +136,7 @@ echo ". \"\$HOME/.asdf/installs/rust/$(cat .tool-versions| grep rust | awk '{pri
 # Testing
 cargo nextest r --all  
 cargo mutants --workspace -j 32 # for mutation testing with 32 concurrent jobs
-cargo miri nextest run --all    # for miri mem-leak testing
+cargo miri nextest run --all -j 32    # for miri mem-leak testing
 
 # Coverage reporting
 cargo llvm-cov --workspace --html --open

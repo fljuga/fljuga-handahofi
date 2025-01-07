@@ -18,6 +18,7 @@
 //! Tablegen preprocessor chunk.
 //!
 
+use std::borrow::Cow;
 use crate::grammar::tokens::comments::filter_comments;
 use crate::grammar::tokens::helpers::*;
 use std::collections::HashSet;
@@ -92,8 +93,6 @@ fn parse_text<'a>(input: &mut &'a str) -> PResult<Chunk<'a>> {
     if text.is_empty() {
         Err(ErrMode::Incomplete(Needed::Unknown))
     } else {
-        let trimmed_text = text.trim();
-
         Ok(Chunk::Text(text.trim()))
     }
 }
@@ -176,12 +175,11 @@ impl<'a> Chunks<'a> {
     }
 }
 
-pub(crate) fn preprocess<'a>(input: &mut &'a str) -> PResult<&'a str> {
+pub(crate) fn preprocess<'a>(input: &mut &'a str) -> PResult<Cow<'a, str>> {
     let mut ctx = EvalContext::new();
-    let mut filtered_comments = filter_comments(input)?;
-    let chunks = parse_chunks(&mut filtered_comments)?;
-    let result = chunks.eval_ctx(&mut ctx);
-    Ok(Box::leak(result.into_boxed_str()))
+    let filtered_comments = filter_comments(input)?.into_owned();
+    let chunks = parse_chunks(&mut &*filtered_comments)?;
+    Ok(Cow::Owned(chunks.eval_ctx(&mut ctx)))
 }
 
 #[cfg(test)]
@@ -277,27 +275,27 @@ mod tests {
             vec![
                 (
                     "#ifdef NAME\n#ifndef NAME2\nsome content\n#endif\n#endif",
-                    Some(""),
+                    Some(Cow::from("")),
                     "",
                 ), // Absent define
                 (
                     "#define NAME\n#ifdef NAME\n#ifndef NAME2\nsome content\n#endif\n#endif",
-                    Some("some content"),
+                    Some(Cow::from("some content")),
                     "",
                 ), // Present define
                 (
                     "#define NAME\n#ifdef NAME\ncontent\n#endif",
-                    Some("content"),
+                    Some(Cow::from("content")),
                     "",
                 ), // Define and condition
                 (
                     "#define NAME\n#ifdef NAME\n/* multiline */// single-line\ncontent\n#endif",
-                    Some("content"),
+                    Some(Cow::from("content")),
                     "",
                 ), // Define and condition
                 (
                     "#define NAME\n#ifdef NAME\n/* multiline */ // single-line\ncontent\n#endif",
-                    Some("content"),
+                    Some(Cow::from("content")),
                     "",
                 ), // Define and condition
             ],
