@@ -22,10 +22,11 @@
 //! *fljuga-handahofi-tablegen* implements a [winnow] parser for LLVM Tablegen files.
 //!
 
+extern crate core;
+
 mod grammar;
 
 use winnow::PResult;
-
 pub fn parse<'a>(input: &'a str) -> PResult<grammar::TableGen<'a>> {
     Ok(grammar::TableGen::<'a> { name: "r" })
 }

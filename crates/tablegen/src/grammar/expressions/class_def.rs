@@ -18,53 +18,53 @@
 //! Tablegen class definitions parsing.
 //!
 
-// use winnow::PResult;
-// use winnow::ascii::*;
-// use winnow::combinator::*;
-// use winnow::error::*;
-// use winnow::stream::{AsChar, Stream};
-// use winnow::token::*;
-// use winnow::*;
+mod body;
+mod template_arg;
 
-// use crate::grammar::tokens::helpers;
+use winnow::PResult;
+use winnow::ascii::*;
+use winnow::combinator::*;
+use winnow::error::*;
+use winnow::*;
+use crate::grammar::expressions::class_def::template_arg::ClassTemplateArg;
+use crate::grammar::tokens::*;
+use crate::grammar::tokens::helpers::*;
+use crate::grammar::tokens::identifier::identifier;
+use crate::grammar::tokens::type_name;
+use crate::grammar::expressions::values::value;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 struct ClassDefinition<'a> {
     name: &'a str,
-    properties: Vec<ClassProperty<'a>>,
+    template_arguments: Vec<ClassTemplateArg<'a>>,
 }
 
-#[derive(Debug)]
-struct ClassProperty<'a> {
+struct ParentClassDefinition<'a> {
     name: &'a str,
-    ty: &'a str,
+    arguments: Vec<ClassTemplateArg<'a>>,
 }
+
+// pub(crate) fn parse_class<'a>(input: &mut &'a str) -> PResult<&'a str> {
+//     preceded(("class", space_or_newline1), (identifier, delimited(("<", space_or_newline1), literal, (space_or_newline1, ">")))).parse_next(input)
+// }
+
+fn opt_value<'a>(input: &mut &'a str) -> PResult<&'a str> {
+    opt(preceded(opt(spaced_literal("=")), spaced_parser(identifier))).map(|opt| opt.unwrap_or_else(|| "")).parse_next(input)
+}
+
 
 // fn class_def<'a>(input: &mut &'a str) -> PResult<ClassDefinition<'a>> {
-//     let name = preceded((literal("class"), space1), internal::identifier);
-//     let bracket = (space1, literal('{'), space0);
-//     let body = terminated(repeat(0.., class_property), (space0, literal('}')));
 //
-//     separated_pair(name, bracket, body).map(|(name, body)| ClassDefinition{ name, properties: vec![] })
-//         .parse_next(input)
+//     let body = delimited(spaced_literal("{"), (), spaced_literal("}"));
+//
+//     preceded(spaced_literal("class"), (spaced_parser(identifier), spaced_parser(parse_template_args), body)).parse_next(input)
 // }
-//
+
 // fn class_property<'a>(input: &mut &'a str) -> PResult<ClassProperty<'a>> {
 //     "x".map(|_| ClassProperty{name: "x", ty: "x"}).parse_next(input)
 // }
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
-
-    #[test]
-    fn should_parse_class_def() {
-        // test_parser(
-        //     vec![
-        //         ("class Name {", Some("Name"), ""), // Valid class, fully consumed
-        //         ("", None, ""),                     // Empty input should fail
-        //     ],
-        //     class_def,
-        // );
-    }
+    use super::*;
 }

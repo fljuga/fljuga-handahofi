@@ -56,7 +56,7 @@ fn filter_multi_line<'a>(input: &mut &'a str) -> PResult<Cow<'a, str>> {
     result
 }
 
-pub(crate) fn filter_comments<'a>(input: &mut &'a str) -> PResult<Cow<'a, str>> {
+pub(crate) fn filter<'a>(input: &mut &'a str) -> PResult<Cow<'a, str>> {
     let result = match filter_multi_line(input)? {
         Cow::Borrowed(input) => filter_single_line(&mut &*input),
         Cow::Owned(input) => Ok(Cow::Owned(filter_single_line(&mut &*input)?.into_owned())),
@@ -134,7 +134,7 @@ mod tests {
                 ("code with no comments", Some(Cow::from("code with no comments")), ""), // No comments
                 ("", Some(Cow::from("")), ""),                         // Empty input should not fail
             ],
-            filter_comments,
+            filter,
         );
     }
 }

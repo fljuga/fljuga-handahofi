@@ -19,14 +19,15 @@
 //!
 
 use std::borrow::Cow;
-use crate::grammar::tokens::comments::filter_comments;
-use crate::grammar::tokens::helpers::*;
 use std::collections::HashSet;
 use winnow::combinator::*;
 use winnow::error::*;
 use winnow::token::*;
 use winnow::PResult;
 use winnow::*;
+
+use crate::grammar::tokens::comments;
+use crate::grammar::tokens::helpers::*;
 
 #[derive(Debug, Clone, PartialEq)]
 enum ConditionType {
@@ -177,8 +178,8 @@ impl<'a> Chunks<'a> {
 
 pub(crate) fn preprocess<'a>(input: &mut &'a str) -> PResult<Cow<'a, str>> {
     let mut ctx = EvalContext::new();
-    let filtered_comments = filter_comments(input)?.into_owned();
-    let chunks = parse_chunks(&mut &*filtered_comments)?;
+    let filtered_comments = comments::filter(input)?.into_owned();
+    let chunks = parse_chunks(&mut filtered_comments.as_str())?;
     Ok(Cow::Owned(chunks.eval_ctx(&mut ctx)))
 }
 

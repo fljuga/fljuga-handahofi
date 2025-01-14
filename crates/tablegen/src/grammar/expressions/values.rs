@@ -17,7 +17,7 @@ use winnow::combinator::*;
 use winnow::PResult;
 use winnow::*;
 
-use crate::grammar::expressions::ranges::*;
+use crate::grammar::tokens::ranges::*;
 
 pub fn value<'a>(input: &mut &'a str) -> PResult<&'a str> {
     simple_value.parse_next(input)
@@ -32,9 +32,6 @@ pub(crate) fn simple_value<'a>(input: &mut &'a str) -> PResult<&'a str> {
     "x".parse_next(input)
 }
 
-pub(crate) fn value_suffix(input: &mut &str) -> PResult<Vec<(i64, i64)>> {
-    delimited("{", range_list, "}").parse_next(input)
-}
 
 // fn slice_elements<'a>(input: &mut &'a str) -> PResult<&'a str> {
 //     delimited("(", slice_element, ")").parse_next(input)

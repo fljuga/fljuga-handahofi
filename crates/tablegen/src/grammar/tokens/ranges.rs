@@ -18,37 +18,34 @@
 //! Tablegen ranges parsing.
 //!
 
+use std::ops::RangeFrom;
 use winnow::combinator::*;
 use winnow::stream::AsChar;
 use winnow::token::*;
 use winnow::PResult;
 use winnow::*;
 
+use crate::grammar::tokens::*;
 use crate::grammar::tokens::digits::*;
 use crate::grammar::tokens::helpers::*;
 
-use crate::grammar::expressions::values::*;
 
-pub(crate) fn range_list(input: &mut &str) -> PResult<Vec<(i64, i64)>> {
-    repeat(1.., range_int_piece).parse_next(input)
+fn ranged_parser<'a, F, T>(parser: F) -> impl Fn(&mut &'a str) -> PResult<(T, T)>
+where
+    F: Fn(&mut &'a str) -> PResult<T> + Clone
+{
+    move |input: &mut &'a str| {
+        alt((
+            (parser.clone(), spaced_literal("..."), parser.clone()),
+            (parser.clone(), take_while(1.., AsChar::is_space), parser.clone()),
+            (parser.clone(), spaced_literal("-"), parser.clone()),
+        ))
+            .map(|(a, _, b)| (a, b))
+            .parse_next(input)
+    }
 }
 
-pub(crate) fn range_int_piece(input: &mut &str) -> PResult<(i64, i64)> {
-    alt((
-        (int, spaced("..."), int),
-        (int, take_while(1.., AsChar::is_space), int),
-        (int, spaced("-"), int),
-    ))
-    .map(|(a, _, b)| (a, b))
-    .parse_next(input)
-}
-
-pub(crate) fn range_value_piece<'a>(input: &mut &'a str) -> PResult<(&'a str, &'a str)> {
-    alt((
-        (value, spaced("..."), value),
-        (value, take_while(1.., AsChar::is_space), value),
-        (value, spaced("-"), value),
-    ))
-    .map(|(a, _, b)| (a, b))
-    .parse_next(input)
+pub(crate) fn range_list(input: &mut &str) -> PResult<Vec<Range>> {
+    separated(1.., ranged_parser(int).map(|(from, to)| std::ops::Range { start: from, end: to}), ",")
+        .parse_next(input)
 }

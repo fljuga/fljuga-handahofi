@@ -58,9 +58,18 @@ where
 }
 
 /// Creates a parser for a static string surrounded by optional spaces or newlines.
-pub(crate) fn spaced<'a>(literal_str: &'static str) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
+pub(crate) fn spaced_literal<'a>(literal_str: &'static str) -> impl Fn(&mut &'a str) -> PResult<&'a str> {
     move |input: &mut &'a str| {
         delimited(space_or_newline0, literal(literal_str), space_or_newline0).parse_next(input)
+    }
+}
+
+pub(crate) fn spaced_parser<'a, F>(parser: F) -> impl Fn(&mut &'a str) -> PResult<&'a str>
+where
+    F: Fn(&mut &'a str) -> PResult<&'a str> + Clone
+{
+    move |input: &mut &'a str| {
+        delimited(space_or_newline0, parser.clone(), space_or_newline0).parse_next(input)
     }
 }
 

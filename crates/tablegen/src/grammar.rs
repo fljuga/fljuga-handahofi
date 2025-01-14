@@ -30,21 +30,26 @@
 // use winnow::stream::{AsChar, Stream};
 // use winnow::*;
 
-mod expressions;
-mod tokens;
+pub(crate) mod expressions;
+pub(crate) mod tokens;
+
+use std::borrow::Cow;
+use winnow::PResult;
+
+use expressions::preprocessor;
 
 #[derive(Debug)]
 pub struct TableGen<'a> {
     pub(crate) name: &'a str,
 }
 
-// fn range_value_piece<'a>(input: &mut &'a str) -> PResult<(&'a str, &'a str)> {
-//     alt((
-//         (crate::grammar::expressions::values::value, internal::spaced("..."), crate::grammar::expressions::values::value),
-//     ))
-//         .map(|(a, _, b)| (a, b))
-//         .parse_next(input)
-// }
+impl<'a> TableGen<'a> {
+    pub fn parse(input: &mut &'a str) -> PResult<Cow<'a, str>> {
+        let preproc = preprocessor::preprocess(input);
+
+        preproc
+    }
+}
 
 #[cfg(test)]
 mod tests {

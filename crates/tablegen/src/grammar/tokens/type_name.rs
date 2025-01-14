@@ -34,7 +34,7 @@ pub(crate) fn generic_type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
     delimited(literal("type<"), identifier, literal(">")).parse_next(input)
 }
 
-fn type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
+pub(crate) fn type_name<'a>(input: &mut &'a str) -> PResult<&'a str> {
     alt((
         "bit", "int", "string", "dag",
         // generic_bits_type_name,

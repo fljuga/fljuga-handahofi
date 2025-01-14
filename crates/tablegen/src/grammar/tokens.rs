@@ -37,6 +37,11 @@ pub(crate) mod strings;
 pub(crate) mod type_name;
 
 pub(crate) mod variable;
+pub(crate) mod ranges;
+
+pub(crate) type Range = std::ops::Range<i64>;
+
+pub(crate) type Ranges = Vec<Range>;
 
 #[cfg(test)]
 mod tests {}
